@@ -1,0 +1,53 @@
+DONE OCT 18             fix 404/home
+DONE OCT 19             routing with ids
+DONE OCT 19             routing with remove
+DONE OCT 19             routing with add
+DONE OCT 19             fix AGAIN routing with add
+DONE OCT 19             add width animation for adding colors
+DONE OCT 19             add width animation for removing colors
+DONE OCT 20             fix mouseout plus button lingering
+DONE OCT 20             add copy thing
+DONE OCT 20             add copy tooltip
+DONE OCT 20             add copy hover animations
+DONE OCT 20             add copy palette thing
+DONE OCT 20             add hex numbers on swatch
+DONE OCT 20             add tooltips for copying
+DONE OCT 20             fix contrast on black/white text color
+IN PROGRESS OCT 20      palettes page
+IN PROGRESS OCT 20      local savedPalettes
+DONE OCT 23             made save update local storage
+
+
+I stopped keeping track but here's what I've done by
+OCT 26                  palettes page
+DONE                    animations for hovering on colors
+DONE                    text for hex code create page
+DONE                    text for hex code palettes page
+DONE                    text changes from black or white
+DONE                    copyability for each color
+DONE                    options button
+DONE                    ::after hover animation for options
+DONE                    open in palette button
+DONE                    remove from saved button
+DONE                    copy palette button
+DONE                    open in generator
+DONE OCT 27             add shadow to plus sign
+DONE OCT 27             ctrl/cmd + number = lock swatch
+DONE OCT 27             ctrl/cmd + shift? + z = undo/redo
+DONE OCT 27             miscelaneous cleanup for events
+DONE OCT 28 THIS TOOK FOR FUCKING EVER!
+                        undo/redo functionality
+                  edit/pick color functionality
+                  create a customize bar for create
+                  create a customize bar for palettes
+                  randomize button
+                  animation for plus disappear?
+                  animation for more button
+                  
+                  settings menu
+                  make hover on lighter colors a little darker
+                  add rgb support
+                  default "this" page breadcrumb thing
+                  create a better 404
+                  make create page mobile friendly
+                  export functionality
