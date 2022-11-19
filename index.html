@@ -11,6 +11,20 @@
 				display: none;
 			}
 		</style>
+		<script type="text/javascript">
+			;(function (l) {
+				if (l.search[1] === '/') {
+					let decoded = l.search
+						.slice(1)
+						.split('&')
+						.map(function (s) {
+							return s.replace(/~and~/g, '&')
+						})
+						.join('?')
+					window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash)
+				}
+			})(window.location)
+		</script>
 		<script type="module" crossorigin src="/PolyChrome/assets/index.87793c3e.js"></script>
 		<link rel="stylesheet" href="/PolyChrome/assets/index.718ec9e4.css" />
 	</head>
@@ -114,20 +128,6 @@
 			<li class="generate"><h2>Generate</h2></li>
 		</footer>
 	</body>
-	<script type="text/javascript">
-		;(function (l) {
-			if (l.search[1] === '/') {
-				let decoded = l.search
-					.slice(1)
-					.split('&')
-					.map(function (s) {
-						return s.replace(/~and~/g, '&')
-					})
-					.join('?')
-				window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash)
-			}
-		})(window.location)
-	</script>
 	<div class="svgs">
 		<svg xmlns="http://www.w3.org/2000/svg">
 			<symbol id="icon-logo">
