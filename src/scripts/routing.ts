@@ -8,15 +8,15 @@ export default class {
 	loadContent = (url?: any) => {
 		if (url) {
 			let { base, ids } = url
-			if (!base && base != '') base = url
+			if (typeof base != 'string') base = url
 			let route = this.routes.get(base)!
 			if (ids) route(ids)
 			else route()
 		} else this.routes.get('404')!()
 	}
 
-	routeToURL = (url: string) => {
-		let deconURL = this.deconstructURL(url)
+	routeToURL = (url: string, siteLoad?: boolean) => {
+		let deconURL = this.deconstructURL(url, siteLoad)
 		let { base, ids } = deconURL
 		if (this.routes.has(base)) {
 			if (base === 'create') {
@@ -30,13 +30,19 @@ export default class {
 
 	navigateTo = (url: string, replace?: boolean) => {
 		replace = replace || false
-		if (replace) history.replaceState('', '', url)
-		else history.pushState('', '', url)
+		if (replace) history.replaceState('', '', '/PolyChrome' + url)
+		else history.pushState('', '', '/PolyChrome' + url)
 		this.routeToURL(url)
 	}
 
-	deconstructURL(url: string) {
+	deconstructURL(url: string, siteLoad?: boolean) {
 		let array = url.replace(/^\//, '').replace(/\/$/, '').split('/')
+		if (siteLoad)
+			return {
+				site: array[0],
+				base: array[1] || '',
+				ids: array[2] ? array[2].split('-') : null,
+			}
 		return {
 			base: array[0],
 			ids: array[1] ? array[1].split('-') : null,

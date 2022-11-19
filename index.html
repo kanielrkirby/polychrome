@@ -2,7 +2,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/public/assets/logo.svg" />
+		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>PolyChrome</title>
 		<script type="module" src="/src/scripts/main.ts" defer></script>
@@ -56,7 +56,7 @@
 			<section class="wrapper-green">
 				<div class="wrapper-green__container wrapper__container">
 					<h2>Generate hundreds of custom palettes instantly.</h2>
-					<svg class="icon-palettes" viewBox="0 0 110 110"><use href="#icon-palettes"></use></svg>
+					<img class="icon-palettes" src="/assets/palettes-icon.svg" alt="Example palettes." />
 				</div>
 			</section>
 			<section class="wrapper-orange">
@@ -83,7 +83,6 @@
 					</div>
 				</div>
 			</section>
-
 			<section class="wrapper-yellow">
 				<div class="wrapper-yellow__container wrapper__container">
 					<h2>Picking colors should be simple.</h2>
@@ -93,29 +92,40 @@
 		</main>
 		<main id="palettes-page" class="palettes-page">
 			<div class="when-empty">
-				<svg viewBox="0 0 100 100"><use href="#empty-state"></use></svg>
-				<a href="/create/">Get Started!</a>
+				<svg viewBox="0 0 100 100"><use href="#empty-state"></use></svg> <a href="/create/">Get Started!</a>
 			</div>
 			<div class="saved-palettes-wrapper"></div>
 		</main>
-		<main id="create-page" class="create-page">
-			<div id="palette" class="palette"></div>
-		</main>
+		<main id="create-page" class="create-page"><div id="palette" class="palette"></div></main>
 		<main id="not-found-page" class="not-found-page">404 STUFF</main>
 		<footer class="toolbar">
 			<ul>
+				<li class="more">
+					<svg viewBox="0 0 100 100"><use href="#icon-more-vertical"></use></svg>
+				</li>
 				<li class="undo"><h2>Undo</h2></li>
 				<li class="redo"><h2>Redo</h2></li>
 				<li class="copy"><h2>Copy</h2></li>
 				<li class="import"><h2>Import</h2></li>
 				<li class="remove-all"><h2>Remove All</h2></li>
-				<li class="right generate"><h2>Generate</h2></li>
-				<li class="more">
-					<svg viewBox="0 0 100 100"><use href="#icon-more-vertical"></use></svg>
-				</li>
 			</ul>
+			<li class="generate"><h2>Generate</h2></li>
 		</footer>
 	</body>
+	<script type="text/javascript">
+		;(function (l) {
+			if (l.search[1] === '/') {
+				let decoded = l.search
+					.slice(1)
+					.split('&')
+					.map(function (s) {
+						return s.replace(/~and~/g, '&')
+					})
+					.join('?')
+				window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash)
+			}
+		})(window.location)
+	</script>
 	<div class="svgs">
 		<svg xmlns="http://www.w3.org/2000/svg">
 			<symbol id="icon-logo">
@@ -181,7 +191,6 @@
 				/>
 			</symbol>
 		</svg>
-
 		<svg xmlns="http://www.w3.org/2000/svg">
 			<symbol id="icon-menu">
 				<rect
@@ -207,7 +216,6 @@
 				/>
 			</symbol>
 		</svg>
-
 		<svg fill="none" xmlns="http://www.w3.org/2000/svg">
 			<symbol id="icon-palettes">
 				<g filter="url(#filter0_d_3_9233)">

@@ -17,7 +17,7 @@ export let router = new Router([
 ])
 
 //* All Events/Inputs
-router.routeToURL(location.pathname)
+router.routeToURL(location.pathname, true)
 setTimeout(() => {
 	;(document.querySelector(':root')! as HTMLElement).style.display = 'initial'
 	if (window.innerHeight > window.innerWidth) document.body.classList.add('vertical')

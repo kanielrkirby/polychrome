@@ -168,18 +168,21 @@ const session = {
 	},
 }
 
+const toolbar = document.querySelector('.toolbar')!
 function pageFactory(title: string, element: HTMLElement, context?: any): Function {
 	return (ids?: string[]) => {
 		document.title = siteTitle + ' | ' + title
-
 		const currentView = document.querySelector('main.visible')
 		if (currentView) currentView.classList.remove('visible')
 		const nextView = element
 		nextView?.classList.add('visible')
 		if (title == 'Palettes') {
+			toolbar.classList.add('palettes')
+			toolbar.classList.remove('create')
 			context.draw(local.savedPalettes.items)
-		}
-		if (title == 'Create') {
+		} else if (title == 'Create') {
+			toolbar.classList.add('create')
+			toolbar.classList.remove('palettes')
 			if (ids) context.generate(ids)
 			else {
 				let slots = context.generate()
@@ -187,7 +190,7 @@ function pageFactory(title: string, element: HTMLElement, context?: any): Functi
 				for (let slot of slots) hexes.push(slot.hex)
 				history.replaceState('', '', hexes.join('-'))
 			}
-		}
+		} else toolbar.classList.remove('palettes', 'create')
 	}
 }
 

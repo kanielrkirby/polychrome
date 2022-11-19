@@ -1,6 +1,7 @@
 import { palette, router } from './main'
 import { session } from './utils'
 
+let nav = document.querySelector('.main-nav')!
 export default function handleKeys() {
 	onkeydown = (e) => {
 		if (e.metaKey || e.ctrlKey) {
@@ -70,6 +71,8 @@ export default function handleKeys() {
 		}
 		if (e.key === 'Escape') {
 			document.querySelector('.confirmation-screen')?.remove()
+			nav.classList.remove('visible')
+			document.querySelector('.overlay')?.remove()
 			return
 		}
 		if (e.key === 'y' || e.key === 'Y') {

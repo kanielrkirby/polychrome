@@ -136,7 +136,7 @@ export default function handleClicks() {
 		}
 
 		// Overlay
-		if (target.closest('.overlay')) {
+		if (target.closest('.clear-overlay')) {
 			target.closest('.popover')!.remove()
 			return
 		}
