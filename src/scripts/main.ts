@@ -24,7 +24,7 @@ setTimeout(() => {
 	else document.body.classList.remove('vertical')
 }, 200)
 
-onpopstate = () => router.navigateTo(location.pathname, true)
+onpopstate = () => router.navigateTo(location.pathname, true, true)
 
 handleClicks()
 

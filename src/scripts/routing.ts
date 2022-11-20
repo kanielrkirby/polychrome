@@ -17,6 +17,7 @@ export default class {
 
 	routeToURL = (url: string, siteLoad?: boolean) => {
 		let deconURL = this.deconstructURL(url, siteLoad)
+		console.log(deconURL)
 		let { base, ids } = deconURL
 		if (this.routes.has(base)) {
 			if (base === 'create') {
@@ -28,11 +29,11 @@ export default class {
 		} else this.loadContent()
 	}
 
-	navigateTo = (url: string, replace?: boolean) => {
+	navigateTo = (url: string, replace?: boolean, siteLoad?: boolean) => {
 		replace = replace || false
-		if (replace) history.replaceState('', '', '/PolyChrome' + url)
+		if (replace) history.replaceState('', '', url)
 		else history.pushState('', '', '/PolyChrome' + url)
-		this.routeToURL(url)
+		this.routeToURL(url, siteLoad)
 	}
 
 	deconstructURL(url: string, siteLoad?: boolean) {
