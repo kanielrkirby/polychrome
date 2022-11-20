@@ -9,6 +9,7 @@ window.ontouchstart = (e) => {
 		!(e.target as HTMLElement).closest('.options div') &&
 		!(e.target as HTMLElement).closest('.options svg')
 	) {
+		e.preventDefault()
 		let vertical = false
 		if (document.body.classList.contains('vertical')) vertical = true
 		palette.plus.disabled = true
