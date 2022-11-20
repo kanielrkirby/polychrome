@@ -5,7 +5,7 @@ let nav = document.querySelector('.main-nav')!
 export default function handleKeys() {
 	onkeydown = (e) => {
 		if (e.metaKey || e.ctrlKey) {
-			let { base } = router.deconstructURL(location.pathname)
+			let { base } = router.deconstructURL(location.pathname, true)
 			if (e.key === 'z' || e.key === 'Z') {
 				if (base === 'palettes') {
 					if (e.shiftKey) session.palettes.redo()
@@ -46,7 +46,7 @@ export default function handleKeys() {
 		}
 		if (e.key === ' ') {
 			//* Space Generate
-			let { base } = router.deconstructURL(location.pathname)
+			let { base } = router.deconstructURL(location.pathname, true)
 			if (base === 'create') {
 				e.preventDefault()
 				let prevIds: string[] = []
@@ -54,16 +54,16 @@ export default function handleKeys() {
 				palette.generate()
 				let ids: string[] = []
 				for (let { hex } of palette.slots) ids.push(hex)
-				history.replaceState('', '', '/create/' + ids.join('-'))
+				history.replaceState('', '', '/polychrome/create/' + ids.join('-'))
 				session.create.push({
 					undo: () => {
 						palette.generate(prevIds)
-						history.replaceState('', '', '/create/' + prevIds.join('-'))
+						history.replaceState('', '', '/polychrome/create/' + prevIds.join('-'))
 						palette.plus.hide()
 					},
 					redo: () => {
 						palette.generate(ids)
-						history.replaceState('', '', '/create/' + ids.join('-'))
+						history.replaceState('', '', '/polychrome/create/' + ids.join('-'))
 					},
 				})
 			}

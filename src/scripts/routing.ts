@@ -32,7 +32,7 @@ export default class {
 	navigateTo = (url: string, replace?: boolean, siteLoad?: boolean) => {
 		replace = replace || false
 		if (replace) history.replaceState('', '', url)
-		else history.pushState('', '', '/PolyChrome' + url)
+		else history.pushState('', '', '/polychrome' + url)
 		this.routeToURL(url, siteLoad)
 	}
 
