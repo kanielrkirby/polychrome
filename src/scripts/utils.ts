@@ -177,10 +177,14 @@ function pageFactory(title: string, element: HTMLElement, context?: any): Functi
 		const nextView = element
 		nextView?.classList.add('visible')
 		if (title == 'Palettes') {
+			document.body.parentElement!.style.overflow = ''
+			document.body.style.overflow = ''
 			toolbar.classList.add('palettes')
 			toolbar.classList.remove('create')
 			context.draw(local.savedPalettes.items)
 		} else if (title == 'Create') {
+			document.body.parentElement!.style.overflow = 'hidden'
+			document.body.style.overflow = 'hidden'
 			toolbar.classList.add('create')
 			toolbar.classList.remove('palettes')
 			if (ids) context.generate(ids)
@@ -190,7 +194,11 @@ function pageFactory(title: string, element: HTMLElement, context?: any): Functi
 				for (let slot of slots) hexes.push(slot.hex)
 				history.replaceState('', '', hexes.join('-'))
 			}
-		} else toolbar.classList.remove('palettes', 'create')
+		} else {
+			toolbar.classList.remove('palettes', 'create')
+			document.documentElement.style.overflow = ''
+			document.body.style.overflow = ''
+		}
 	}
 }
 

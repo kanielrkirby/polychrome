@@ -1,8 +1,8 @@
 import { palette, router } from './main'
 import { session } from './utils'
 
-window.addEventListener('scroll', stopMotion)
-window.addEventListener('touchmove', stopMotion)
+window.addEventListener('scroll', stopMotion, false)
+window.addEventListener('touchmove', stopMotion, { passive: false })
 function stopMotion(e: Event) {
 	if (router.deconstructURL(location.pathname).base == 'create') {
 		e.preventDefault()
