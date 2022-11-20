@@ -1,5 +1,14 @@
-import { palette } from './main'
+import { palette, router } from './main'
 import { session } from './utils'
+
+window.addEventListener('scroll', stopMotion)
+window.addEventListener('touchmove', stopMotion)
+function stopMotion(e: Event) {
+	if (router.deconstructURL(location.pathname).base == 'create') {
+		e.preventDefault()
+		e.stopPropagation()
+	}
+}
 
 window.ontouchstart = (e) => {
 	//* If you click a swatch, add event listeners
@@ -9,7 +18,6 @@ window.ontouchstart = (e) => {
 		!(e.target as HTMLElement).closest('.options div') &&
 		!(e.target as HTMLElement).closest('.options svg')
 	) {
-		e.preventDefault()
 		let vertical = false
 		if (document.body.classList.contains('vertical')) vertical = true
 		palette.plus.disabled = true
@@ -24,9 +32,9 @@ window.ontouchstart = (e) => {
 		let amount = 0
 		let width
 		//* Mouse tracking
-		addEventListener('touchmove', dragHandler)
+		window.addEventListener('touchmove', dragHandler, { passive: false })
 		//* When you release the click button, remove event listeners and finalize
-		addEventListener(
+		window.addEventListener(
 			'touchend',
 			() => {
 				swatch.classList.remove('is-dragging')
