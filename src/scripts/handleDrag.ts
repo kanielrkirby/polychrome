@@ -147,6 +147,7 @@ window.ontouchstart = (e) => {
 			{ once: true }
 		)
 		function dragHandler(e: TouchEvent) {
+			e.preventDefault()
 			// Dragged swatched
 			if (vertical) {
 				let t = e.touches[0].clientY - startY
