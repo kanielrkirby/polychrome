@@ -1,35 +1,10 @@
 import { router, palette, palettes } from './main'
 import { session, toolTip, popOver, confirmation, local, inputField, settingsPopover } from './utils'
 export default function handleClicks() {
-	window.ontouchstart = (e) => {
-		if ((e.target as HTMLElement).closest('#nav-button')) {
-			mainNav.classList.toggle('visible')
-			if (mainNav.classList.contains('visible')) {
-				let overlay = document.createElement('div')
-				overlay.classList.add('overlay')
-				mainHeader.append(overlay)
-				document.body.style.overflowY = 'hidden'
-				palette.plus.hide()
-				overlay.addEventListener(
-					'click',
-					() => {
-						overlay.remove()
-						mainNav.classList.remove('visible')
-						document.body.style.overflowY = ''
-					},
-					{ once: true }
-				)
-				document.body.style.overflowY = 'hidden'
-			} else {
-				mainHeader.querySelector('.overlay')?.remove()
-				document.body.style.overflowY = ''
-			}
-		}
-	}
-
 	//* Create Page Palette
 	;(document.querySelector('#palette')! as HTMLElement).onclick = async (e) => {
 		let target = e.target as HTMLElement
+		let pType = (e as PointerEvent).pointerType
 
 		// Add Button
 		let add = target.closest('.plus-container svg')
@@ -58,8 +33,9 @@ export default function handleClicks() {
 		}
 
 		// Lock Button
-		let lock = target.closest('.lock')
+		let lock = target.closest('.lock') as HTMLElement
 		if (lock) {
+			if (pType == 'touch') lock.blur()
 			let swatch = target.closest('.swatch')!
 			let index = parseInt(swatch.getAttribute('data-color-index')!)
 			let slot = palette.slots[index]

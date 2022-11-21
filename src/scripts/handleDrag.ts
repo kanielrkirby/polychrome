@@ -368,7 +368,6 @@ export default function handleDrag() {
 				if (vertical) {
 					let t = e.y - startY
 					swatch.style.translate = '0 ' + t + 'px'
-					// Swatches to right of dragged swatch
 					let next = swatch
 					let testCase = palette.slots.length - index - 1
 					width = 0
@@ -379,18 +378,17 @@ export default function handleDrag() {
 							next = next.nextElementSibling as HTMLElement
 							if (t > width) {
 								amount++
-								if (next.style.translate != `0 -100%`) next.style.translate = `0 -100%`
-							} else if (next.style.translate == `0 -100%`) next.style.translate = ''
+								if (next.style.translate != `0px -100%`) next.style.translate = `0px -100%`
+							} else if (next.style.translate == `0px -100%`) next.style.translate = ''
 						}
 					} else {
-						// Swatches to left of dragged swatch
 						for (let i = 0; i < index; i++) {
 							width = (i * 2 + 1) * halfHeight
 							next = next.previousElementSibling as HTMLElement
 							if (-t > width) {
 								amount--
-								if (next.style.translate != `0 100%`) next.style.translate = `0 100%`
-							} else if (next.style.translate == `0 100%`) next.style.translate = ''
+								if (next.style.translate != `0px 100%`) next.style.translate = `0px 100%`
+							} else if (next.style.translate == `0px 100%`) next.style.translate = ''
 						}
 					}
 				} else {
