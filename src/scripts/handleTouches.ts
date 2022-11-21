@@ -1,8 +1,8 @@
 import { router, palette, palettes } from './main'
 import { session, toolTip, popOver, confirmation, local, inputField, settingsPopover } from './utils'
-export default function handleClicks() {
+export default function handleTouches() {
 	//* Create Page Palette
-	;(document.querySelector('#palette')! as HTMLElement).onclick = async (e) => {
+	;(document.querySelector('#palette')! as HTMLElement).ontouchstart = async (e) => {
 		let target = e.target as HTMLElement
 
 		// Add Button
@@ -91,12 +91,12 @@ export default function handleClicks() {
 			if (target.closest('.icon')) {
 				await navigator.clipboard.writeText(slot.hex).then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [e.x, e.y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [e.touches[0].clientX, e.touches[0].clientY] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [e.x, e.y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [e.touches[0].clientX, e.touches[0].clientY] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
@@ -107,7 +107,7 @@ export default function handleClicks() {
 	}
 
 	//* Palettes Page Palette Container
-	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.onclick = async (e) => {
+	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.ontouchstart = async (e) => {
 		let target = e.target as HTMLElement
 
 		// Copy Swatch
@@ -122,12 +122,12 @@ export default function handleClicks() {
 				)
 				.then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [e.x, e.y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [e.touches[0].clientX, e.touches[0].clientY] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [e.x, e.y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [e.touches[0].clientX, e.touches[0].clientY] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
@@ -160,12 +160,12 @@ export default function handleClicks() {
 				)
 				.then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [e.x, e.y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [e.touches[0].clientX, e.touches[0].clientY] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [e.x, e.y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [e.touches[0].clientX, e.touches[0].clientY] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
@@ -209,7 +209,7 @@ export default function handleClicks() {
 	}
 
 	//* Toolbar
-	;(document.querySelector('.toolbar') as HTMLElement)!.onclick = async (e) => {
+	;(document.querySelector('.toolbar') as HTMLElement)!.ontouchstart = async (e) => {
 		let target = e.target as HTMLElement
 
 		// Undo Button
@@ -337,7 +337,7 @@ export default function handleClicks() {
 	let mainNav = document.querySelector('.main-nav')!
 	let mainHeader = document.querySelector('.main-header')!
 	//* Misc
-	onclick = async (e) => {
+	ontouchstart = async (e) => {
 		let target = e.target as HTMLElement
 
 		// Links
@@ -361,7 +361,7 @@ export default function handleClicks() {
 				document.body.style.overflowY = 'hidden'
 				palette.plus.hide()
 				overlay.addEventListener(
-					'click',
+					'touchstart',
 					() => {
 						overlay.remove()
 						mainNav.classList.remove('visible')

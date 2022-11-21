@@ -6,6 +6,7 @@ import Router from './routing'
 import handleClicks from './handleClicks'
 import handleDrag from './handleDrag'
 import handleKeys from './handleKeys'
+import handleTouches from './handleTouches'
 
 export let palette = new Palette()
 export let palettes = new SavedPalettes()
@@ -27,6 +28,7 @@ setTimeout(() => {
 onpopstate = () => router.navigateTo(location.pathname, true, true)
 
 handleClicks()
+handleTouches()
 
 handleDrag()
 

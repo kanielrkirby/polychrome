@@ -47,7 +47,7 @@
 			visibility: hidden;
 			scale: 0;
 			position: relative;
-			width: 5em;
+			width: 6.5em;
 			height: 5em;
 			z-index: 1;
 			cursor: pointer;
@@ -68,7 +68,7 @@
 				visibility: initial;
 				scale: 1 !important;
 				use[href='#icon-lock-arm'] {
-					transform: translate(0);
+					transform: translateX(0%);
 				}
 			}
 		}
@@ -142,8 +142,12 @@
 			scale: 1 !important;
 			visibility: initial;
 			padding: 0;
+			border-radius: 0;
 			width: 2em;
 			height: 2em;
+			&:hover {
+				background-color: initial;
+			}
 		}
 		&:hover {
 			background-color: white;

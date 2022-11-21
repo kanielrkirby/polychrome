@@ -373,15 +373,6 @@ button {
 		opacity: 0;
 		animation: opacity-appear 0.2s ease forwards;
 	}
-	&.remove-all {
-		.yes {
-			color: red;
-			&:hover,
-			&:active {
-				background-color: black;
-			}
-		}
-	}
 	&.import-create,
 	&.import-palettes,
 	&.settings-popover {
@@ -393,7 +384,8 @@ button {
 			}
 		}
 	}
-	&.cookies-confirmation .no {
+	&.cookies-confirmation .no,
+	&.remove-all-confirmation .yes {
 		&:hover,
 		&:active {
 			color: red;
