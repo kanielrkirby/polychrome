@@ -216,21 +216,21 @@ export default function handleClicks() {
 
 		// Undo Button
 		if (target.closest('.undo')) {
-			if (router.deconstructURL(location.pathname).base == 'create') session.create.undo()
+			if (router.deconstructURL(location.pathname, true).base == 'create') session.create.undo()
 			else session.palettes.undo()
 			return
 		}
 
 		// Redo Button
 		if (target.closest('.redo')) {
-			if (router.deconstructURL(location.pathname).base == 'create') session.create.redo()
+			if (router.deconstructURL(location.pathname, true).base == 'create') session.create.redo()
 			else session.palettes.redo()
 			return
 		}
 
 		// Copy Button
 		if (target.closest('.copy')) {
-			if (router.deconstructURL(location.pathname).base == 'create') {
+			if (router.deconstructURL(location.pathname, true).base == 'create') {
 				let colors = []
 				for (let { hex } of palette.slots) colors.push(hex)
 				await navigator.clipboard.writeText(colors.join('\n')).then(
@@ -410,7 +410,7 @@ export default function handleClicks() {
 
 			// Import Create
 			if (confirmationScreen == document.querySelector('.import-create')) {
-				let hexes = router.deconstructURL(location.pathname).ids!
+				let hexes = router.deconstructURL(location.pathname, true).ids!
 				let confirm = target.closest('.yes')
 				let cancel = target.closest('.no')
 				if (confirm) {

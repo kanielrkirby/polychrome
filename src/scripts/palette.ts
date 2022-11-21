@@ -71,7 +71,7 @@ export default class {
 			if (type == 'slot') this.details = 'slot'
 			else this.details = ''
 			let index = local.settings.lastColorAlgorithmIndex
-			if (!index) local.settings = { lastColorAlgorithmIndex: 1 }
+			if (typeof index != 'number') local.settings = { lastColorAlgorithmIndex: 1 }
 			return this.list[index]
 		},
 		details: '',
