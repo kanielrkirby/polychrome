@@ -216,6 +216,18 @@ function toolTip(message: string, options?: { pos?: [x: number, y: number]; dura
 		tip.style.left = options.pos[0] + 'px'
 		tip.style.top = options.pos[1] + 'px'
 	} else tip.classList.add('centered')
+	setTimeout(() => {
+		if (options && options.pos) {
+			if (tip.clientWidth + options.pos[0] > document.body.clientWidth) {
+				tip.style.translate = '-100%'
+				if (tip.clientHeight + options.pos[1] > document.body.clientHeight) {
+					tip.style.translate = '-100 -100%'
+				}
+			} else if (tip.clientHeight + options.pos[1] > document.body.clientHeight) {
+				tip.style.translate = '0 -100%'
+			}
+		}
+	}, 0)
 	tip.addEventListener(
 		'animationend',
 		() => {
