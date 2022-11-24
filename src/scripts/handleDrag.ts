@@ -10,13 +10,13 @@ export default function handleDrag() {
 			e.stopPropagation()
 		}
 	}
-	window.ontouchstart = (e) => {
+	window.ontouchstart = (e: TouchEvent) => {
 		//* If you click a swatch, add event listeners
-		let swatch = (e.target as HTMLElement).closest('.create-page .swatch') as HTMLElement
+		let swatch = (e.targetTouches[0].target as HTMLElement).closest('.create-page .swatch') as HTMLElement
 		if (
 			swatch &&
-			!(e.target as HTMLElement).closest('.options div') &&
-			!(e.target as HTMLElement).closest('.options svg')
+			!(e.targetTouches[0].target as HTMLElement).closest('.options div') &&
+			!(e.targetTouches[0].target as HTMLElement).closest('.options svg')
 		) {
 			let vertical = false
 			if (document.body.classList.contains('vertical')) vertical = true
