@@ -2,10 +2,17 @@ import { router, palette, palettes } from './main'
 import { session, toolTip, popOver, confirmation, local, inputField, settingsPopover } from './utils'
 export default function handleClicks() {
 	//* Create Page Palette
-	;(document.querySelector('#palette')! as HTMLElement).onclick = async (e) => {
+	let cancelPalMouse = false
+	;(document.querySelector('#palette')! as HTMLElement).ontouchend = () => paletteClick
+	;(document.querySelector('#palette')! as HTMLElement).onclick = () => paletteClick
+	async function paletteClick(e: MouseEvent) {
 		let target = e.target as HTMLElement
-		let pType = (e as PointerEvent).pointerType
-
+		if ((e as PointerEvent).pointerType != 'mouse') {
+			cancelPalMouse = true
+			setTimeout(() => {
+				cancelPalMouse = false
+			}, 10)
+		} else if (cancelPalMouse) return
 		// Add Button
 		let add = target.closest('.plus-container svg')
 		if (add) {
@@ -35,7 +42,6 @@ export default function handleClicks() {
 		// Lock Button
 		let lock = target.closest('.lock') as HTMLElement
 		if (lock) {
-			if (pType == 'touch') lock.blur()
 			let swatch = target.closest('.swatch')!
 			let index = parseInt(swatch.getAttribute('data-color-index')!)
 			let slot = palette.slots[index]
@@ -109,8 +115,17 @@ export default function handleClicks() {
 	}
 
 	//* Palettes Page Palette Container
-	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.onclick = async (e) => {
+	let cancelPalsMouse = false
+	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.onclick = () => palettesClick
+	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.ontouchend = () => palettesClick
+	async function palettesClick(e: MouseEvent) {
 		let target = e.target as HTMLElement
+		if ((e as PointerEvent).pointerType != 'mouse') {
+			cancelPalsMouse = true
+			setTimeout(() => {
+				cancelPalsMouse = false
+			}, 10)
+		} else if (cancelPalsMouse) return
 
 		// Copy Swatch
 		let swatch = target.closest('.swatch')
@@ -211,8 +226,17 @@ export default function handleClicks() {
 	}
 
 	//* Toolbar
-	;(document.querySelector('.toolbar') as HTMLElement)!.onclick = async (e) => {
+	let cancelToolMouse = false
+	;(document.querySelector('.toolbar') as HTMLElement)!.onclick = () => toolbarClick
+	;(document.querySelector('.toolbar') as HTMLElement)!.ontouchend = () => toolbarClick
+	async function toolbarClick(e: MouseEvent) {
 		let target = e.target as HTMLElement
+		if ((e as PointerEvent).pointerType != 'mouse') {
+			cancelToolMouse = true
+			setTimeout(() => {
+				cancelToolMouse = false
+			}, 10)
+		} else if (cancelToolMouse) return
 
 		// Undo Button
 		if (target.closest('.undo')) {
@@ -339,9 +363,17 @@ export default function handleClicks() {
 	let mainNav = document.querySelector('.main-nav')!
 	let mainHeader = document.querySelector('.main-header')!
 	//* Misc
-	onclick = async (e) => {
+	let cancelGlobalMouse = false
+	window.onclick = () => globalClick
+	window.ontouchend = () => globalClick
+	async function globalClick(e: MouseEvent) {
 		let target = e.target as HTMLElement
-
+		if ((e as PointerEvent).pointerType != 'mouse') {
+			cancelGlobalMouse = true
+			setTimeout(() => {
+				cancelGlobalMouse = false
+			}, 10)
+		} else if (cancelGlobalMouse) return
 		// Links
 		let a = target.closest('a')
 		if (a) {
