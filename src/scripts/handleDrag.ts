@@ -172,8 +172,8 @@ export default function handleDrag() {
 							next = next.nextElementSibling as HTMLElement
 							if (t > width) {
 								amount++
-								if (next.style.translate != `0 -100%`) next.style.translate = `0 -100%`
-							} else if (next.style.translate == `0 -100%`) next.style.translate = '0 0'
+								if (next.style.translate != `0px -100%`) next.style.translate = `0 -100%`
+							} else if (next.style.translate == `0px -100%`) next.style.translate = '0 0'
 						}
 					} else {
 						// Swatches to left of dragged swatch
@@ -182,8 +182,8 @@ export default function handleDrag() {
 							next = next.previousElementSibling as HTMLElement
 							if (-t > width) {
 								amount--
-								if (next.style.translate != `0 100%`) next.style.translate = `0 100%`
-							} else if (next.style.translate == `0 100%`) next.style.translate = '0 0'
+								if (next.style.translate != `0px 100%`) next.style.translate = `0 100%`
+							} else if (next.style.translate == `0px 100%`) next.style.translate = '0 0'
 						}
 					}
 				} else {

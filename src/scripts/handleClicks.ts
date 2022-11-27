@@ -2,17 +2,18 @@ import { router, palette, palettes } from './main'
 import { session, toolTip, popOver, confirmation, local, inputField, settingsPopover } from './utils'
 export default function handleClicks() {
 	//* Create Page Palette
-	let cancelPalMouse = false
-	;(document.querySelector('#palette')! as HTMLElement).ontouchend = () => paletteClick
-	;(document.querySelector('#palette')! as HTMLElement).onclick = () => paletteClick
-	async function paletteClick(e: MouseEvent) {
+	;(document.querySelector('#palette')! as HTMLElement).onclick = (e) => paletteClick(e)
+	;(document.querySelector('#palette')! as HTMLElement).ontouchend = (e) => paletteClick(e)
+	let cancelClick = false
+	async function paletteClick(e: MouseEvent | TouchEvent) {
 		let target = e.target as HTMLElement
+		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
-			cancelPalMouse = true
+			cancelClick = true
 			setTimeout(() => {
-				cancelPalMouse = false
-			}, 10)
-		} else if (cancelPalMouse) return
+				cancelClick = false
+			}, 75)
+		}
 		// Add Button
 		let add = target.closest('.plus-container svg')
 		if (add) {
@@ -99,12 +100,12 @@ export default function handleClicks() {
 			if (target.closest('.icon')) {
 				await navigator.clipboard.writeText(slot.hex).then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [e.x, e.y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [e.x, e.y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
@@ -115,17 +116,17 @@ export default function handleClicks() {
 	}
 
 	//* Palettes Page Palette Container
-	let cancelPalsMouse = false
-	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.onclick = () => palettesClick
-	;(document.querySelector('.palettes-page .saved-palettes-wrapper') as HTMLElement)!.ontouchend = () => palettesClick
-	async function palettesClick(e: MouseEvent) {
+	;(document.querySelector('.saved-palettes-wrapper') as HTMLElement).ontouchend = (e) => palettesClick(e)
+	;(document.querySelector('.saved-palettes-wrapper') as HTMLElement).onclick = (e) => palettesClick(e)
+	async function palettesClick(e: MouseEvent | TouchEvent) {
 		let target = e.target as HTMLElement
+		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
-			cancelPalsMouse = true
+			cancelClick = true
 			setTimeout(() => {
-				cancelPalsMouse = false
-			}, 10)
-		} else if (cancelPalsMouse) return
+				cancelClick = false
+			}, 75)
+		}
 
 		// Copy Swatch
 		let swatch = target.closest('.swatch')
@@ -139,22 +140,16 @@ export default function handleClicks() {
 				)
 				.then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [e.x, e.y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [e.x, e.y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
 				)
-			return
-		}
-
-		// Overlay
-		if (target.closest('.clear-overlay')) {
-			target.closest('.popover')!.remove()
 			return
 		}
 
@@ -177,12 +172,12 @@ export default function handleClicks() {
 				)
 				.then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [e.x, e.y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [e.x, e.y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
@@ -226,18 +221,19 @@ export default function handleClicks() {
 	}
 
 	//* Toolbar
-	let cancelToolMouse = false
-	;(document.querySelector('.toolbar') as HTMLElement)!.onclick = () => toolbarClick
-	;(document.querySelector('.toolbar') as HTMLElement)!.ontouchend = () => toolbarClick
-	async function toolbarClick(e: MouseEvent) {
-		let target = e.target as HTMLElement
+	let tool = document.querySelector('.toolbar') as HTMLElement
+	tool.ontouchend = (e) => toolbarClick(e)
+	tool.onclick = (e) => toolbarClick(e)
+	async function toolbarClick(e: MouseEvent | TouchEvent) {
+		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
-			cancelToolMouse = true
+			cancelClick = true
 			setTimeout(() => {
-				cancelToolMouse = false
-			}, 10)
-		} else if (cancelToolMouse) return
+				cancelClick = false
+			}, 75)
+		}
 
+		let target = e.target as HTMLElement
 		// Undo Button
 		if (target.closest('.undo')) {
 			if (router.deconstructURL(location.pathname, true).base == 'create') session.create.undo()
@@ -358,22 +354,53 @@ export default function handleClicks() {
 			}
 			return
 		}
+
+		if (target.closest('.more')) {
+			if (router.deconstructURL(location.pathname, true).base == 'create')
+				tool.append(
+					popOver(
+						[
+							{ content: 'Save', class: 'save' },
+							{ content: 'Import', class: 'import' },
+							{ content: 'Copy', class: 'copy' },
+						],
+						{ type: 'tool-menu' }
+					)
+				)
+			else
+				tool.append(
+					popOver(
+						[
+							{ content: 'Remove All', class: 'remove-all' },
+							{ content: 'Import', class: 'import' },
+							{ content: 'Copy All', class: 'copy' },
+						],
+						{ type: 'tool-menu' }
+					)
+				)
+		}
 	}
 
 	let mainNav = document.querySelector('.main-nav')!
 	let mainHeader = document.querySelector('.main-header')!
 	//* Misc
-	let cancelGlobalMouse = false
-	window.onclick = () => globalClick
-	window.ontouchend = () => globalClick
-	async function globalClick(e: MouseEvent) {
-		let target = e.target as HTMLElement
+	window.ontouchend = (e) => globalClick(e)
+	window.onclick = (e) => globalClick(e)
+	async function globalClick(e: MouseEvent | TouchEvent) {
+		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
-			cancelGlobalMouse = true
+			cancelClick = true
 			setTimeout(() => {
-				cancelGlobalMouse = false
-			}, 10)
-		} else if (cancelGlobalMouse) return
+				cancelClick = false
+			}, 75)
+		}
+		let target = e.target as HTMLElement
+		// Overlay
+		if (target.closest('.clear-overlay')) {
+			document.querySelector('.popover')!.remove()
+			document.querySelector('.clear-overlay')!.remove()
+			return
+		}
 		// Links
 		let a = target.closest('a')
 		if (a) {

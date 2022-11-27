@@ -6,8 +6,8 @@ body,
 }
 html {
 	background-color: white;
-	min-width: 100%;
-	min-height: 100%;
+	width: 100%;
+	height: 100%;
 }
 body {
 	position: relative;
@@ -15,8 +15,8 @@ body {
 	font-family: 'Comfortaa';
 	font-weight: bold;
 	text-align: center;
-	min-width: 100%;
-	min-height: 100vh;
+	width: 100%;
+	height: 100%;
 	background-color: #f2f2f2;
 }
 .svgs {
@@ -435,39 +435,6 @@ button {
 	.right {
 		justify-content: end;
 	}
-	.remove-all {
-		h2 {
-			color: red;
-		}
-		&:hover,
-		&:active {
-			background-color: black;
-		}
-	}
-	.import {
-		&:hover,
-		&:active {
-			background-color: black;
-			color: cyan;
-		}
-	}
-	.generate {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		&:hover,
-		&:active {
-			background-color: black;
-			color: cyan;
-		}
-	}
-	.save {
-		&:hover,
-		&:active {
-			background-color: black;
-			color: lime;
-		}
-	}
 	.more {
 		display: none;
 		height: 100%;
@@ -501,6 +468,16 @@ button {
 			}
 		}
 	}
+	.generate {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		&:hover,
+		&:active {
+			background-color: black;
+			color: cyan;
+		}
+	}
 	&.create {
 		visibility: visible;
 		.remove-all {
@@ -514,6 +491,76 @@ button {
 			display: none;
 		}
 	}
+	.remove-all {
+		h2 {
+			color: red;
+		}
+		&:hover {
+			background-color: black;
+		}
+	}
+	.import {
+		&:hover {
+			background-color: black;
+			color: cyan;
+		}
+	}
+	.save {
+		&:hover {
+			background-color: black;
+			color: lime;
+		}
+	}
+}
+
+.popover {
+	position: absolute;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 20;
+	background: #fbfbfb;
+	width: 10em;
+	border-radius: 1em;
+	overflow: hidden;
+	border: 1px solid black;
+	box-shadow: 1px 1px 5px black;
+	user-select: none;
+	.list {
+		position: relative;
+		display: flex;
+		width: 100%;
+		z-index: 10;
+		padding: 0;
+		margin: 0;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+	}
+	.choice {
+		display: flex !important;
+		justify-content: center;
+		align-items: center;
+		flex-direction: column;
+		width: 100%;
+		height: 4em;
+		cursor: pointer;
+		transition: all 0.05s ease;
+		&:not(:last-child) {
+			border-bottom: 1px solid #e2e2e2;
+		}
+		&:hover {
+			background-color: #e2e2e2;
+		}
+	}
+}
+.clear-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9;
+	width: 100vw;
+	height: 100vh;
 }
 
 body.vertical .toolbar {

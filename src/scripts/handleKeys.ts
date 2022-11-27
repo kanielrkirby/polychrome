@@ -4,6 +4,13 @@ import { session } from './utils'
 let nav = document.querySelector('.main-nav')!
 export default function handleKeys() {
 	onkeydown = (e) => {
+		if (document.querySelector('.confirmation-screen')) {
+			if (e.key === 'Escape') {
+				document.querySelector('.confirmation-screen')?.remove()
+				return
+			}
+			return
+		}
 		if (e.metaKey || e.ctrlKey) {
 			let { base } = router.deconstructURL(location.pathname, true)
 			if (e.key === 'z' || e.key === 'Z') {
@@ -70,17 +77,8 @@ export default function handleKeys() {
 			return
 		}
 		if (e.key === 'Escape') {
-			document.querySelector('.confirmation-screen')?.remove()
 			nav.classList.remove('visible')
 			document.querySelector('.overlay')?.remove()
-			return
-		}
-		if (e.key === 'y' || e.key === 'Y') {
-			;(document.querySelector('.confirmation-screen')?.querySelector('.yes') as HTMLElement).click()
-			return
-		}
-		if (e.key === 'n' || e.key === 'N') {
-			;(document.querySelector('.confirmation-screen')?.querySelector('.no') as HTMLElement).click()
 			return
 		}
 		//! NOT DONE

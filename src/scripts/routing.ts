@@ -17,7 +17,6 @@ export default class {
 
 	routeToURL = (url: string, siteLoad?: boolean) => {
 		let deconURL = this.deconstructURL(url, siteLoad)
-		console.log(deconURL)
 		let { base, ids } = deconURL
 		if (this.routes.has(base)) {
 			if (base === 'create') {

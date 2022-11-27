@@ -248,22 +248,27 @@ function toolTip(message: string, options?: { pos?: [x: number, y: number]; dura
 	return tip
 }
 
-function popOver(choices: { content?: string; id: string }[], options?: { type?: string; hex?: string }) {
+function popOver(
+	choices: { content?: string; id?: string; class?: string }[],
+	options?: { type?: string; hex?: string }
+) {
 	let div = document.createElement('div')
 	div.classList.add('popover')
 	let overlay = document.createElement('div')
 	overlay.classList.add('clear-overlay')
-	if (options?.type == 'menu') {
+	if (options?.type == 'menu' || options?.type == 'tool-menu') {
 		let list = document.createElement('ul')
 		list.classList.add('list')
 		for (let choice of choices) {
 			let item = document.createElement('div')
-			item.id = choice.id
+			if (choice.id) item.id = choice.id
 			item.classList.add('choice')
 			if (choice.content) item.innerHTML = choice.content
+			if (choice.class) item.classList.add(choice.class)
 			list.append(item)
 		}
-		div.append(list, overlay)
+		div.append(list)
+		document.body.append(overlay)
 	} else if (options?.type == 'color-picker') {
 		let canvas = document.createElement('canvas')
 		canvas.id = 'color-picker'
@@ -307,6 +312,7 @@ function popOver(choices: { content?: string; id: string }[], options?: { type?:
 		hueBar.append(hueCurs, hueInput)
 		div.append(canvas, hueBar)
 	}
+	if (options?.type == 'tool-menu') div.style.translate = '0 -100%'
 	return div
 }
 
