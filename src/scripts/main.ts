@@ -17,14 +17,14 @@ export let router = new Router([
 ])
 
 //* All Events/Inputs
-router.routeToURL(location.pathname, true)
+router.routeToURL(location.pathname)
 setTimeout(() => {
 	;(document.querySelector(':root')! as HTMLElement).style.display = 'initial'
 	if (window.innerHeight > window.innerWidth) document.body.classList.add('vertical')
 	else document.body.classList.remove('vertical')
 }, 200)
 
-onpopstate = () => router.navigateTo(location.pathname, true, true)
+onpopstate = () => router.navigateTo(location.pathname, true)
 
 handleClicks()
 

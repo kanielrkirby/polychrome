@@ -12,7 +12,7 @@ export default function handleKeys() {
 			return
 		}
 		if (e.metaKey || e.ctrlKey) {
-			let { base } = router.deconstructURL(location.pathname, true)
+			let { base } = router.deconstructURL(location.pathname)
 			if (e.key === 'z' || e.key === 'Z') {
 				if (base === 'palettes') {
 					if (e.shiftKey) session.palettes.redo()
@@ -53,7 +53,7 @@ export default function handleKeys() {
 		}
 		if (e.key === ' ') {
 			//* Space Generate
-			let { base } = router.deconstructURL(location.pathname, true)
+			let { base } = router.deconstructURL(location.pathname)
 			if (base === 'create') {
 				e.preventDefault()
 				let prevIds: string[] = []

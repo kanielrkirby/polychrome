@@ -256,7 +256,7 @@ function popOver(
 	div.classList.add('popover')
 	let overlay = document.createElement('div')
 	overlay.classList.add('clear-overlay')
-	if (options?.type == 'menu' || options?.type == 'tool-menu') {
+	if (options?.type == 'menu' || options?.type == 'tool-menu' || options?.type == 'tool-menu-side') {
 		let list = document.createElement('ul')
 		list.classList.add('list')
 		for (let choice of choices) {
@@ -313,6 +313,7 @@ function popOver(
 		div.append(canvas, hueBar)
 	}
 	if (options?.type == 'tool-menu') div.style.translate = '0 -100%'
+	if (options?.type == 'tool-menu-side') div.style.translate = '100% -100%'
 	return div
 }
 

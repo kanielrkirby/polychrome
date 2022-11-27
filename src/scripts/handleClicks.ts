@@ -92,11 +92,11 @@ export default function handleClicks() {
 		if (target.closest('.info')) {
 			let swatch = target.closest('.swatch')!
 			let slot = palette.slots[parseInt(swatch.getAttribute('data-color-index')!)]
-			if (target.closest('.hex')) {
-				let menu = popOver([{ id: '' }], { type: 'color-picker', hex: slot.hex })
-				swatch.append(menu)
-				return
-			}
+			// if (target.closest('.hex')) {
+			// 	let menu = popOver([{ id: '' }], { type: 'color-picker', hex: slot.hex })
+			// 	swatch.append(menu)
+			// 	return
+			// }
 			if (target.closest('.icon')) {
 				await navigator.clipboard.writeText(slot.hex).then(
 					() => {
@@ -236,21 +236,22 @@ export default function handleClicks() {
 		let target = e.target as HTMLElement
 		// Undo Button
 		if (target.closest('.undo')) {
-			if (router.deconstructURL(location.pathname, true).base == 'create') session.create.undo()
+			let url = router.deconstructURL(location.pathname)
+			if (url.base == 'create') session.create.undo()
 			else session.palettes.undo()
 			return
 		}
 
 		// Redo Button
 		if (target.closest('.redo')) {
-			if (router.deconstructURL(location.pathname, true).base == 'create') session.create.redo()
+			if (router.deconstructURL(location.pathname).base == 'create') session.create.redo()
 			else session.palettes.redo()
 			return
 		}
 
 		// Copy Button
 		if (target.closest('.copy')) {
-			if (router.deconstructURL(location.pathname, true).base == 'create') {
+			if (router.deconstructURL(location.pathname).base == 'create') {
 				let colors = []
 				for (let { hex } of palette.slots) colors.push(hex)
 				await navigator.clipboard.writeText(colors.join('\n')).then(
@@ -316,6 +317,36 @@ export default function handleClicks() {
 			return
 		}
 
+		while (document.querySelectorAll('.popover').length > 0) document.querySelector('.popover')?.remove()
+		if (target.closest('.add-1-color')) {
+			if (palette.slots.length < 8) palette.addSlot({})
+			return
+		} else if (target.closest('.add-2-color')) {
+			for (let i = 0; i < 2; i++) if (palette.slots.length < 8) palette.addSlot({})
+			return
+		} else if (target.closest('.add-3-color')) {
+			for (let i = 0; i < 3; i++) if (palette.slots.length < 8) palette.addSlot({})
+			return
+		} else if (target.closest('.add-4-color')) {
+			for (let i = 0; i < 4; i++) if (palette.slots.length < 8) palette.addSlot({})
+			return
+		}
+
+		if (target.closest('.add-colors')) {
+			tool.append(
+				popOver(
+					[
+						{ content: '1', class: 'add-1-color' },
+						{ content: '2', class: 'add-2-color' },
+						{ content: '3', class: 'add-3-color' },
+						{ content: '4', class: 'add-4-color' },
+					],
+					{ type: 'tool-menu-side' }
+				)
+			)
+			return
+		}
+
 		// Remove All Button
 		if (target.closest('.remove-all')) {
 			confirmation(
@@ -341,7 +372,7 @@ export default function handleClicks() {
 
 		// Import Button
 		if (target.closest('.import')) {
-			if (router.deconstructURL(location.pathname, true).base == 'create') {
+			if (router.deconstructURL(location.pathname).base == 'create') {
 				let field = inputField(`Paste hex code palette below!`, 'import-create')
 				document.body.append(field)
 			} else {
@@ -355,14 +386,15 @@ export default function handleClicks() {
 			return
 		}
 
-		if (target.closest('.more')) {
-			if (router.deconstructURL(location.pathname, true).base == 'create')
+		if (target.closest('.more'))
+			if (router.deconstructURL(location.pathname).base == 'create')
 				tool.append(
 					popOver(
 						[
 							{ content: 'Save', class: 'save' },
 							{ content: 'Import', class: 'import' },
 							{ content: 'Copy', class: 'copy' },
+							{ content: 'Add Colors', class: 'add-colors' },
 						],
 						{ type: 'tool-menu' }
 					)
@@ -378,7 +410,6 @@ export default function handleClicks() {
 						{ type: 'tool-menu' }
 					)
 				)
-		}
 	}
 
 	let mainNav = document.querySelector('.main-nav')!
@@ -396,11 +427,8 @@ export default function handleClicks() {
 		}
 		let target = e.target as HTMLElement
 		// Overlay
-		if (target.closest('.clear-overlay')) {
-			document.querySelector('.popover')!.remove()
-			document.querySelector('.clear-overlay')!.remove()
-			return
-		}
+		document.querySelector('.popover')?.remove()
+		document.querySelector('.clear-overlay')?.remove()
 		// Links
 		let a = target.closest('a')
 		if (a) {
@@ -421,15 +449,17 @@ export default function handleClicks() {
 				mainHeader.append(overlay)
 				document.body.style.overflowY = 'hidden'
 				palette.plus.hide()
-				overlay.addEventListener(
-					'click',
-					() => {
-						overlay.remove()
-						mainNav.classList.remove('visible')
-						document.body.style.overflowY = ''
-					},
-					{ once: true }
-				)
+				setTimeout(() => {
+					overlay.addEventListener(
+						'click',
+						() => {
+							overlay.remove()
+							mainNav.classList.remove('visible')
+							document.body.style.overflowY = ''
+						},
+						{ once: true }
+					)
+				}, 50)
 				document.body.style.overflowY = 'hidden'
 			} else {
 				mainHeader.querySelector('.overlay')?.remove()
@@ -469,7 +499,7 @@ export default function handleClicks() {
 
 			// Import Create
 			if (confirmationScreen == document.querySelector('.import-create')) {
-				let hexes = router.deconstructURL(location.pathname, true).ids!
+				let hexes = router.deconstructURL(location.pathname).ids!
 				let confirm = target.closest('.yes')
 				let cancel = target.closest('.no')
 				if (confirm) {
@@ -571,11 +601,15 @@ export default function handleClicks() {
 					confirmationScreen.remove()
 					let tip = toolTip(message)
 					document.body.append(tip)
+					document.querySelector('.main-nav')!.classList.remove('visible')
+					document.querySelector('.overlay.')?.remove()
 				} else if (cancel) {
 					let message = 'Changes discarded.'
 					confirmationScreen.remove()
 					let tip = toolTip(message)
 					document.body.append(tip)
+					document.querySelector('.main-nav')!.classList.remove('visible')
+					document.querySelector('.overlay.')?.remove()
 				}
 				return
 			}

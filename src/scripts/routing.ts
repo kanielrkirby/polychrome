@@ -15,8 +15,8 @@ export default class {
 		} else this.routes.get('404')!()
 	}
 
-	routeToURL = (url: string, siteLoad?: boolean) => {
-		let deconURL = this.deconstructURL(url, siteLoad)
+	routeToURL = (url: string) => {
+		let deconURL = this.deconstructURL(url)
 		let { base, ids } = deconURL
 		if (this.routes.has(base)) {
 			if (base === 'create') {
@@ -28,22 +28,23 @@ export default class {
 		} else this.loadContent()
 	}
 
-	navigateTo = (url: string, replace?: boolean, siteLoad?: boolean) => {
+	navigateTo = (url: string, replace?: boolean) => {
 		replace = replace || false
 		if (replace) history.replaceState('', '', url)
 		else history.pushState('', '', '/polychrome' + url)
-		this.routeToURL(url, siteLoad)
+		this.routeToURL(url)
 	}
 
-	deconstructURL(url: string, siteLoad?: boolean) {
+	deconstructURL(url: string) {
 		let array = url.replace(/^\//, '').replace(/\/$/, '').split('/')
-		if (siteLoad)
+		if (array[0] == 'polychrome')
 			return {
-				site: array[0],
+				site: 'polychrome',
 				base: array[1] || '',
 				ids: array[2] ? array[2].split('-') : null,
 			}
 		return {
+			site: 'polychrome',
 			base: array[0],
 			ids: array[1] ? array[1].split('-') : null,
 		}
