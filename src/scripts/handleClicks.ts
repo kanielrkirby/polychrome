@@ -90,22 +90,23 @@ export default function handleClicks() {
 
 		// Copy Button
 		if (target.closest('.info')) {
+			cancelClick = true
+			setTimeout(() => {
+				cancelClick = false
+			}, 75)
 			let swatch = target.closest('.swatch')!
 			let slot = palette.slots[parseInt(swatch.getAttribute('data-color-index')!)]
-			// if (target.closest('.hex')) {
-			// 	let menu = popOver([{ id: '' }], { type: 'color-picker', hex: slot.hex })
-			// 	swatch.append(menu)
-			// 	return
-			// }
+			let x = (e as PointerEvent).pageX,
+				y = (e as PointerEvent).pageY
 			if (target.closest('.icon')) {
 				await navigator.clipboard.writeText(slot.hex).then(
 					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
+						let tip = toolTip('Copied hex to clipboard!', { pos: [x, y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					},
 					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
+						let tip = toolTip('Copy to clipboard failed.', { pos: [x, y] })
 						tip.classList.add('at-mouse-pos')
 						document.body.append(tip)
 					}
@@ -207,15 +208,20 @@ export default function handleClicks() {
 		// More Button
 		let more = target.closest('.more')
 		if (more) {
-			let menu = popOver(
-				[
-					{ content: 'Open', id: 'palettes-open' },
-					{ content: 'Remove', id: 'palettes-remove' },
-					{ content: 'Copy', id: 'palettes-copy' },
-				],
-				{ type: 'menu' }
+			cancelClick = true
+			setTimeout(() => {
+				cancelClick = false
+			}, 75)
+			more.parentElement!.append(
+				popOver(
+					[
+						{ content: 'Open', id: 'palettes-open' },
+						{ content: 'Remove', id: 'palettes-remove' },
+						{ content: 'Copy', id: 'palettes-copy' },
+					],
+					{ type: 'menu' }
+				)
 			)
-			more.parentElement!.append(menu)
 			return
 		}
 	}
