@@ -12,26 +12,19 @@ export default class SavedPalettes {
 		if (palettes) {
 			for (let i = 0; i < palettes.length; i++) {
 				let palette = palettes[i]
-
 				let container = document.createElement('div')
 				container.setAttribute('data-palette-index', i.toString())
 				container.classList.add('palette-container')
-
 				let pal = document.createElement('div')
 				pal.classList.add('palette')
-
 				let options = document.createElement('div')
 				options.classList.add('options')
-
 				let more = document.createElement('div')
 				more.classList.add('more')
-
 				let moreSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 				moreSvg.setAttribute('viewBox', '0 0 100 100')
-
 				let moreUse = document.createElementNS('http://www.w3.org/2000/svg', 'use')
 				moreUse.setAttribute('href', '#icon-more-horizontal')
-
 				for (let j = 0; j < palette.length; j++) {
 					let hex = palette[j]
 					let { lum } = deconstructHex(hex)

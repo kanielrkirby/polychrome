@@ -37,6 +37,10 @@ export default class {
 		},
 		hide() {
 			if (this.active) {
+				this.disabled = true
+				setTimeout(() => {
+					this.disabled = false
+				}, 300)
 				document.getElementById('plus-button')?.parentElement!.parentElement!.remove()
 				this.active = false
 			}

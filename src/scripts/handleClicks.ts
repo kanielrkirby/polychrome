@@ -31,11 +31,13 @@ export default function handleClicks() {
 					palette.removeSlot(slot, { animations: false })
 					ids!.splice(addIndex + 1, 1)
 					history.replaceState('', '', ids!.join('-'))
+					palette.plus.hide()
 				},
 				redo() {
 					palette.addSlot(slot, { animations: false })
 					ids!.splice(addIndex + 1, 0, slot.hex)
 					history.replaceState('', '', ids!.join('-'))
+					palette.plus.hide()
 				},
 			})
 			if (palette.slots.length > 9) palette.plus.hide()
@@ -75,16 +77,19 @@ export default function handleClicks() {
 			palette.removeSlot(slot)
 			ids!.splice(slot.data, 1)
 			history.replaceState('', '', ids!.join('-'))
+			palette.plus.hide()
 			session.create.push({
 				undo() {
 					palette.addSlot(slot, { animations: false })
 					ids!.splice(slot.data, 0, slot.hex)
 					history.replaceState('', '', ids!.join('-'))
+					palette.plus.hide()
 				},
 				redo() {
 					palette.removeSlot(slot, { animations: false })
 					ids!.splice(slot.data, 1)
 					history.replaceState('', '', ids!.join('-'))
+					palette.plus.hide()
 				},
 			})
 			return
