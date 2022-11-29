@@ -59,7 +59,7 @@ onmouseover = (e) => {
 				let index = parseInt(swatch.getAttribute('data-color-index')!)
 				if (left) index--
 				palette.plus.show(index)
-			} else palette.plus.hide()
+			} else palette.plus.hide(0)
 		}
 	}
 }
