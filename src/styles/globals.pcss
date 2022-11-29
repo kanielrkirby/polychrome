@@ -26,7 +26,7 @@ body {
 .main-header {
 	position: sticky;
 	top: 0;
-	z-index: 5;
+	z-index: 16;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -37,18 +37,6 @@ body {
 	list-style: none;
 	font-size: min(0.7em, 1.5vw);
 	transition: height 0.2s ease;
-	.overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		z-index: 4;
-		height: 100%;
-		background-color: #00000070;
-		backdrop-filter: blur(5px);
-		opacity: 0;
-		animation: opacity-appear 0.2s ease forwards;
-	}
 	.home-text {
 		display: none;
 	}
@@ -363,16 +351,6 @@ button {
 			}
 		}
 	}
-	.overlay {
-		position: absolute;
-		width: 100%;
-		z-index: 105;
-		height: 100%;
-		background-color: #00000070;
-		backdrop-filter: blur(5px);
-		opacity: 0;
-		animation: opacity-appear 0.2s ease forwards;
-	}
 	&.import-create,
 	&.import-palettes,
 	&.settings-popover {
@@ -519,11 +497,16 @@ button {
 .popover {
 	position: absolute;
 	display: flex;
+	&.bottom {
+		position: fixed;
+		bottom: 0;
+	}
 	justify-content: center;
 	align-items: center;
 	z-index: 20;
 	background: #fbfbfb;
-	width: 10em;
+	max-width: 30em;
+	width: 100%;
 	border-radius: 1em;
 	overflow: hidden;
 	border: 1px solid black;
@@ -561,22 +544,38 @@ button {
 	position: fixed;
 	top: 0;
 	left: 0;
-	z-index: 9;
+	z-index: 15;
 	width: 100vw;
 	height: 100vh;
 }
 
-body.vertical .toolbar {
-	ul {
-		justify-content: left;
+body.vertical,
+body.landscape-thin {
+	.toolbar {
+		ul {
+			justify-content: left;
+		}
+		.more {
+			display: initial;
+		}
+		.save,
+		.import,
+		.remove-all,
+		.copy {
+			display: none;
+		}
 	}
-	.more {
-		display: initial;
-	}
-	.save,
-	.import,
-	.remove-all,
-	.copy {
-		display: none;
-	}
+}
+
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 15;
+	height: 100%;
+	background-color: #00000070;
+	backdrop-filter: blur(5px);
+	opacity: 0;
+	animation: opacity-appear 0.2s ease forwards;
 }

@@ -47,11 +47,11 @@
 			visibility: hidden;
 			scale: 0;
 			position: relative;
-			width: 6.5em;
-			height: 5em;
+			width: 4.5em;
+			height: 3.5em;
 			z-index: 1;
 			cursor: pointer;
-			padding: 1.5em;
+			padding: 1em;
 			border-radius: 1em;
 			overflow: visible;
 			transition: scale 0.2s ease, background-color 0.075s ease;
@@ -105,57 +105,66 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
-		width: 90%;
+		width: 0;
 		justify-content: space-around;
 		align-items: center;
 	}
-	.info {
+	.info-container {
 		display: flex;
+		width: 0;
+		height: 0;
 		justify-content: space-around;
 		align-items: center;
-		width: 100%;
-		max-width: 8em;
-		gap: 0.5em;
-		flex-direction: row;
-		background-color: rgb(203, 209, 217);
-		padding: 0.25em;
-		user-select: none;
-		border-radius: 0.5em;
-		box-shadow: inset 2px 2px 5px 1px black;
-		transition: background-color 0.2s ease, box-shadow 0.2s ease;
-		.hex {
-			cursor: pointer;
-			position: relative;
+		.info {
 			display: flex;
-			z-index: 1;
-			justify-content: center;
+			justify-content: space-around;
 			align-items: center;
-			font-size: small;
-			color: black;
-			font-size: min(1.1rem, 1.75vw);
-			max-width: 100%;
-			height: 100%;
-		}
-		.icon {
-			cursor: pointer;
-			fill: black !important;
-			scale: 1 !important;
-			visibility: initial;
-			padding: 0;
-			border-radius: 0;
-			width: 2em;
-			height: 2em;
-			&:hover {
-				background-color: initial;
+			width: fit-content;
+			max-width: 7em;
+			gap: 0.225em;
+			flex-direction: row;
+			background-color: rgb(203, 209, 217);
+			padding: 0.5rem;
+			user-select: none;
+			border-radius: 0.5em;
+			box-shadow: inset 2px 2px 5px 1px black;
+			transition: background-color 0.2s ease, box-shadow 0.2s ease;
+			.hex {
+				cursor: pointer;
+				position: relative;
+				display: flex;
+				z-index: 1;
+				justify-content: center;
+				align-items: center;
+				color: black;
+				font-size: 1rem;
+				width: fit-content;
+				height: 100%;
+				margin: 0;
 			}
-		}
-		&:hover {
-			background-color: white;
-			box-shadow: inset 1px 1px 2.5px 1px black;
+			.icon {
+				cursor: pointer;
+				fill: black !important;
+				scale: 1 !important;
+				visibility: initial;
+				padding: 0;
+				border-radius: 0;
+				width: 2em;
+				height: 2em;
+				&:hover {
+					background-color: initial;
+				}
+			}
+			&:hover {
+				background-color: white;
+				box-shadow: inset 1px 1px 2.5px 1px black;
+			}
 		}
 	}
 
 	.popover {
+		position: fixed;
+		bottom: 0;
 		z-index: 20;
 		display: flex;
 		flex-direction: column;
@@ -190,18 +199,11 @@
 				height: 100%;
 			}
 		}
-		.overlay {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			z-index: 50;
-		}
 	}
 
 	.detector {
 		position: absolute;
 		right: 0;
-		/* background-color: red; */
 		width: 30%;
 		height: 60%;
 		&.left {
@@ -247,7 +249,11 @@ body.vertical {
 			flex-direction: column;
 			.swatch {
 				.options {
-					height: 0em;
+					height: 0;
+					width: 100%;
+					.info-container {
+						width: fit-content;
+					}
 				}
 				&.init {
 					width: 0%;
@@ -278,7 +284,7 @@ body.vertical {
 					.info {
 						width: 10em;
 						.hex {
-							font-size: 1.1rem;
+							font-size: 1rem;
 						}
 					}
 				}
@@ -292,6 +298,14 @@ body.vertical {
 					translate: 0;
 				}
 			}
+		}
+	}
+}
+
+body.landscape-thin {
+	.create-page .options {
+		.info-container {
+			rotate: -90deg;
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import { router, palette, palettes } from './main'
 import { session, toolTip, popOver, confirmation, local, inputField, settingsPopover } from './utils'
+import { Slot } from './palette'
 export default function handleClicks() {
 	//* Create Page Palette
 	;(document.querySelector('#palette')! as HTMLElement).onclick = (e) => paletteClick(e)
@@ -9,6 +10,7 @@ export default function handleClicks() {
 		let target = e.target as HTMLElement
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
+			focus()
 			cancelClick = true
 			setTimeout(() => {
 				cancelClick = false
@@ -36,7 +38,7 @@ export default function handleClicks() {
 					history.replaceState('', '', ids!.join('-'))
 				},
 			})
-			if (palette.slots.length == 8) palette.plus.hide()
+			if (palette.slots.length > 9) palette.plus.hide()
 			return
 		}
 
@@ -123,6 +125,7 @@ export default function handleClicks() {
 		let target = e.target as HTMLElement
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
+			focus()
 			cancelClick = true
 			setTimeout(() => {
 				cancelClick = false
@@ -154,57 +157,6 @@ export default function handleClicks() {
 			return
 		}
 
-		// Open Button
-		if (target.closest('#palettes-open')) {
-			router.navigateTo(
-				'/create/' +
-					local.savedPalettes.items[
-						parseInt(target.closest('.palette-container')!.getAttribute('data-palette-index')!)
-					].join('-')
-			)
-			return
-		}
-
-		// Copy Button
-		if (target.closest('#palettes-copy')) {
-			await navigator.clipboard
-				.writeText(
-					palettes.items[parseInt(target.closest('.palette-container')!.getAttribute('data-palette-index')!)].join('\n')
-				)
-				.then(
-					() => {
-						let tip = toolTip('Copied hex to clipboard!', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
-						tip.classList.add('at-mouse-pos')
-						document.body.append(tip)
-					},
-					() => {
-						let tip = toolTip('Copy to clipboard failed.', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
-						tip.classList.add('at-mouse-pos')
-						document.body.append(tip)
-					}
-				)
-			return
-		}
-
-		// Remove Button
-		if (target.closest('#palettes-remove')) {
-			let index = parseInt(target.closest('.palette-container')!.getAttribute('data-palette-index')!)
-			let item = palettes.items[index]
-			let cmd = {
-				undo() {
-					palettes.addItem(item, index)
-				},
-				redo() {
-					palettes.removeItem(index)
-				},
-			}
-			session.palettes.push(cmd)
-			palettes.removeItem(index)
-			let tip = toolTip(`Removed palette.`)
-			document.body.append(tip)
-			return
-		}
-
 		// More Button
 		let more = target.closest('.more')
 		if (more) {
@@ -215,15 +167,67 @@ export default function handleClicks() {
 			more.parentElement!.append(
 				popOver(
 					[
-						{ content: 'Open', id: 'palettes-open' },
-						{ content: 'Remove', id: 'palettes-remove' },
-						{ content: 'Copy', id: 'palettes-copy' },
+						{ content: 'Open', class: 'palettes-open' },
+						{ content: 'Remove', class: 'palettes-remove' },
+						{ content: 'Copy', class: 'palettes-copy' },
 					],
 					{ type: 'menu' }
 				)
 			)
 			return
 		}
+		let choice = target.closest('.choice') as HTMLElement
+		if (choice) {
+			if (choice.classList.contains('palettes-open')) {
+				router.navigateTo(
+					'/create/' +
+						local.savedPalettes.items[
+							parseInt(target.closest('.palette-container')!.getAttribute('data-palette-index')!)
+						].join('-')
+				)
+				return
+			}
+			if (choice.classList.contains('palettes-copy')) {
+				await navigator.clipboard
+					.writeText(
+						palettes.items[parseInt(target.closest('.palette-container')!.getAttribute('data-palette-index')!)].join(
+							'\n'
+						)
+					)
+					.then(
+						() => {
+							let tip = toolTip('Copied hex to clipboard!', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
+							tip.classList.add('at-mouse-pos')
+							document.body.append(tip)
+						},
+						() => {
+							let tip = toolTip('Copy to clipboard failed.', { pos: [(e as MouseEvent).x, (e as MouseEvent).y] })
+							tip.classList.add('at-mouse-pos')
+							document.body.append(tip)
+						}
+					)
+				return
+			}
+			if (choice.classList.contains('palettes-remove')) {
+				let index = parseInt(target.closest('.palette-container')!.getAttribute('data-palette-index')!)
+				let item = palettes.items[index]
+				let cmd = {
+					undo() {
+						palettes.addItem(item, index)
+					},
+					redo() {
+						palettes.removeItem(index)
+					},
+				}
+				session.palettes.push(cmd)
+				palettes.removeItem(index)
+				let tip = toolTip(`Removed palette.`)
+				document.body.append(tip)
+				return
+			}
+		}
+		document.querySelector('.popover')?.remove()
+		document.querySelector('.clear-overlay')?.remove()
 	}
 
 	//* Toolbar
@@ -233,6 +237,7 @@ export default function handleClicks() {
 	async function toolbarClick(e: MouseEvent | TouchEvent) {
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
+			focus()
 			cancelClick = true
 			setTimeout(() => {
 				cancelClick = false
@@ -257,33 +262,7 @@ export default function handleClicks() {
 
 		// Copy Button
 		if (target.closest('.copy')) {
-			if (router.deconstructURL(location.pathname).base == 'create') {
-				let colors = []
-				for (let { hex } of palette.slots) colors.push(hex)
-				await navigator.clipboard.writeText(colors.join('\n')).then(
-					() => {
-						let tip = toolTip('Copied palette!')
-						document.body.append(tip)
-					},
-					() => {
-						let tip = toolTip('Failed to copy.')
-						document.body.append(tip)
-					}
-				)
-			} else {
-				let pals = []
-				for (let pal of palettes.items) pals.push(pal.join('-'))
-				await navigator.clipboard.writeText(pals.join(',\n')).then(
-					() => {
-						let tip = toolTip('Copied palettes to clipboard!')
-						document.body.append(tip)
-					},
-					() => {
-						let tip = toolTip('Copy to clipboard failed.')
-						document.body.append(tip)
-					}
-				)
-			}
+			copyButton()
 			return
 		}
 
@@ -311,111 +290,26 @@ export default function handleClicks() {
 
 		// Save Button
 		if (target.closest('.save')) {
-			if (!local.settings.cookiesOk) {
-				document.body.append(toolTip(`You'll need to enable cookies in settings for that feature.`))
-				return
-			}
-			let array = []
-			for (let { hex } of palette.slots) array.push(hex)
-			palettes.addItem(array)
-			let tip = toolTip('Saved palette!')
-			document.body.append(tip)
-			return
-		}
-
-		while (document.querySelectorAll('.popover').length > 0) document.querySelector('.popover')?.remove()
-		if (target.closest('.add-1-color')) {
-			if (palette.slots.length < 8) palette.addSlot({})
-			return
-		} else if (target.closest('.add-2-color')) {
-			for (let i = 0; i < 2; i++) if (palette.slots.length < 8) palette.addSlot({})
-			return
-		} else if (target.closest('.add-3-color')) {
-			for (let i = 0; i < 3; i++) if (palette.slots.length < 8) palette.addSlot({})
-			return
-		} else if (target.closest('.add-4-color')) {
-			for (let i = 0; i < 4; i++) if (palette.slots.length < 8) palette.addSlot({})
-			return
-		}
-
-		if (target.closest('.add-colors')) {
-			tool.append(
-				popOver(
-					[
-						{ content: '1', class: 'add-1-color' },
-						{ content: '2', class: 'add-2-color' },
-						{ content: '3', class: 'add-3-color' },
-						{ content: '4', class: 'add-4-color' },
-					],
-					{ type: 'tool-menu-side' }
-				)
-			)
+			saveButton()
 			return
 		}
 
 		// Remove All Button
 		if (target.closest('.remove-all')) {
-			confirmation(
-				{
-					message: `Are you sure you want to delete all of your palettes? You won't be able to undo this.`,
-					value: 'remove-all',
-				},
-				[
-					{
-						message: `Yes, delete away.`,
-						value: 'yes',
-						call() {
-							for (let i = 0; palettes.items.length; i++) palettes.removeItem(0)
-							let tip = toolTip('All palettes removed.')
-							document.body.append(tip)
-						},
-					},
-					{ message: `No, please don't delete my stuff!`, value: 'no' },
-				]
-			)
+			removeAllButton()
 			return
 		}
 
 		// Import Button
 		if (target.closest('.import')) {
-			if (router.deconstructURL(location.pathname).base == 'create') {
-				let field = inputField(`Paste hex code palette below!`, 'import-create')
-				document.body.append(field)
-			} else {
-				if (!local.settings.cookiesOk) {
-					document.body.append(toolTip(`You'll need to enable cookies in settings for that feature.`))
-					return
-				}
-				let field = inputField(`Paste hex code palette below! Separate palettes by commas.`, 'import-palettes')
-				document.body.append(field)
-			}
+			importButton()
 			return
 		}
 
-		if (target.closest('.more'))
-			if (router.deconstructURL(location.pathname).base == 'create')
-				tool.append(
-					popOver(
-						[
-							{ content: 'Save', class: 'save' },
-							{ content: 'Import', class: 'import' },
-							{ content: 'Copy', class: 'copy' },
-							{ content: 'Add Colors', class: 'add-colors' },
-						],
-						{ type: 'tool-menu' }
-					)
-				)
-			else
-				tool.append(
-					popOver(
-						[
-							{ content: 'Remove All', class: 'remove-all' },
-							{ content: 'Import', class: 'import' },
-							{ content: 'Copy All', class: 'copy' },
-						],
-						{ type: 'tool-menu' }
-					)
-				)
+		if (target.closest('.more')) {
+			moreButton()
+			return
+		}
 	}
 
 	let mainNav = document.querySelector('.main-nav')!
@@ -426,6 +320,7 @@ export default function handleClicks() {
 	async function globalClick(e: MouseEvent | TouchEvent) {
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
+			focus()
 			cancelClick = true
 			setTimeout(() => {
 				cancelClick = false
@@ -435,6 +330,38 @@ export default function handleClicks() {
 		// Overlay
 		document.querySelector('.popover')?.remove()
 		document.querySelector('.clear-overlay')?.remove()
+		// PopOver Buttons
+		let choice = target.closest('.choice') as HTMLElement
+		if (choice) {
+			if (choice.classList.contains('copy')) {
+				copyButton()
+				return
+			}
+			if (choice.classList.contains('save')) {
+				saveButton()
+				return
+			}
+			if (choice.classList.contains('add-color')) {
+				colorAmountButton(choice)
+				return
+			}
+			if (choice.classList.contains('add-colors')) {
+				addColorsButton()
+				return
+			}
+			if (choice.classList.contains('remove-all')) {
+				removeAllButton()
+				return
+			}
+			if (choice.classList.contains('import')) {
+				importButton()
+				return
+			}
+			if (choice.classList.contains('more')) {
+				moreButton()
+				return
+			}
+		}
 		// Links
 		let a = target.closest('a')
 		if (a) {
@@ -536,8 +463,10 @@ export default function handleClicks() {
 					let tip = toolTip(message)
 					document.body.append(tip)
 					confirmationScreen.remove()
+					document.querySelector('.overlay')?.remove()
 				} else if (cancel) {
 					confirmationScreen.remove()
+					document.querySelector('.overlay')?.remove()
 				}
 				return
 			}
@@ -562,9 +491,9 @@ export default function handleClicks() {
 						input.length == 0
 							? false
 							: true
-					console.log(input.replaceAll(',', '').length % 6 != 0)
+					input.replaceAll(',', '').length % 6 != 0
 					let pals = input.split(',')
-					for (let pal of pals) if (pal.length / 6 > 8 || !(pal.length >= 6)) isValid = false
+					for (let pal of pals) if (pal.length / 6 > 10 || !(pal.length >= 6)) isValid = false
 					if (isValid) {
 						let i = 0
 						for (let pal of pals) {
@@ -608,14 +537,14 @@ export default function handleClicks() {
 					let tip = toolTip(message)
 					document.body.append(tip)
 					document.querySelector('.main-nav')!.classList.remove('visible')
-					document.querySelector('.overlay.')?.remove()
+					document.querySelector('.overlay')?.remove()
 				} else if (cancel) {
 					let message = 'Changes discarded.'
 					confirmationScreen.remove()
 					let tip = toolTip(message)
 					document.body.append(tip)
 					document.querySelector('.main-nav')!.classList.remove('visible')
-					document.querySelector('.overlay.')?.remove()
+					document.querySelector('.overlay')?.remove()
 				}
 				return
 			}
@@ -641,4 +570,159 @@ export default function handleClicks() {
 			}
 		}
 	}
+}
+
+// Copy Button
+async function copyButton() {
+	if (router.deconstructURL(location.pathname).base == 'create') {
+		let colors = []
+		for (let { hex } of palette.slots) colors.push(hex)
+		await navigator.clipboard.writeText(colors.join('\n')).then(
+			() => {
+				let tip = toolTip('Copied palette!')
+				document.body.append(tip)
+			},
+			() => {
+				let tip = toolTip('Failed to copy.')
+				document.body.append(tip)
+			}
+		)
+	} else {
+		let pals = []
+		for (let pal of palettes.items) pals.push(pal.join('-'))
+		await navigator.clipboard.writeText(pals.join(',\n')).then(
+			() => {
+				let tip = toolTip('Copied palettes to clipboard!')
+				document.body.append(tip)
+			},
+			() => {
+				let tip = toolTip('Copy to clipboard failed.')
+				document.body.append(tip)
+			}
+		)
+	}
+	return
+}
+
+// Save Button
+function saveButton() {
+	if (!local.settings.cookiesOk) {
+		document.body.append(toolTip(`You'll need to enable cookies in settings for that feature.`))
+		return
+	}
+	let array = []
+	for (let { hex } of palette.slots) array.push(hex)
+	palettes.addItem(array)
+	let tip = toolTip('Saved palette!')
+	document.body.append(tip)
+	return
+}
+
+function colorAmountButton(colorButton: HTMLElement) {
+	const { ids } = router.deconstructURL(location.pathname)
+	let n = parseInt(colorButton.getAttribute('data-amount')!)
+	let slots: Slot[] = []
+	for (let i = 0; i < n; i++) {
+		slots.push(palette.addSlot({}))
+		ids!.push(slots[i].hex)
+	}
+	history.replaceState('', '', ids!.join('-'))
+	session.create.push({
+		undo() {
+			for (let i = 0; i < n; i++) {
+				palette.removeSlot(slots[slots.length - 1 - i], { animations: false })
+				ids!.pop()
+			}
+			history.replaceState('', '', ids!.join('-'))
+		},
+		redo() {
+			for (let i = 0; i < n; i++) {
+				palette.addSlot(slots[i], { animations: false })
+				ids!.push(slots[i].hex)
+			}
+			history.replaceState('', '', ids!.join('-'))
+		},
+	})
+	return
+}
+
+function addColorsButton() {
+	let array = [
+		{ content: '1', class: 'add-color', attribute: ['data-amount', '1'] },
+		{ content: '2', class: 'add-color', attribute: ['data-amount', '2'] },
+		{ content: '3', class: 'add-color', attribute: ['data-amount', '3'] },
+		{ content: '4', class: 'add-color', attribute: ['data-amount', '4'] },
+	]
+	for (let i = palette.slots.length + 4; i > 10; i--) array.pop()
+	if (array.length < 1) {
+		document.body.append(toolTip('Too many colors!'))
+		return
+	}
+	document.body.append(popOver(array, { type: 'tool-menu' }))
+	return
+}
+
+// Remove All Button
+function removeAllButton() {
+	confirmation(
+		{
+			message: `Are you sure you want to delete all of your palettes? You won't be able to undo this.`,
+			value: 'remove-all',
+		},
+		[
+			{
+				message: `Yes, delete away.`,
+				value: 'yes',
+				call() {
+					for (let i = 0; palettes.items.length; i++) palettes.removeItem(0)
+					let tip = toolTip('All palettes removed.')
+					document.body.append(tip)
+				},
+			},
+			{ message: `No, please don't delete my stuff!`, value: 'no' },
+		]
+	)
+	return
+}
+
+// Import Button
+function importButton() {
+	if (router.deconstructURL(location.pathname).base == 'create') {
+		let field = inputField(`Paste hex code palette below!`, 'import-create')
+		document.body.append(field)
+	} else {
+		if (!local.settings.cookiesOk) {
+			document.body.append(toolTip(`You'll need to enable cookies in settings for that feature.`))
+			return
+		}
+		let field = inputField(`Paste hex code palette below! Separate palettes by commas.`, 'import-palettes')
+		document.body.append(field)
+	}
+	return
+}
+
+function moreButton() {
+	if (router.deconstructURL(location.pathname).base == 'create')
+		document.body.append(
+			popOver(
+				[
+					{ content: 'Save', class: 'save' },
+					{ content: 'Import', class: 'import' },
+					{ content: 'Copy', class: 'copy' },
+					{ content: 'Add Colors', class: 'add-colors' },
+				],
+				{ type: 'tool-menu' }
+			)
+		)
+	else
+		document.body.append(
+			popOver(
+				[
+					{ content: 'Remove All', class: 'remove-all' },
+					{ content: 'Import', class: 'import' },
+					{ content: 'Copy All', class: 'copy' },
+				],
+				{ type: 'tool-menu' }
+			)
+		)
 }

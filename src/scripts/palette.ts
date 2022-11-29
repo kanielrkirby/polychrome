@@ -2,7 +2,7 @@ import colorAlgorithms from './colorAlgorithms'
 import { deconstructHex, local, uuid } from './utils'
 let pal = document.getElementById('palette')!
 
-type Slot = {
+export type Slot = {
 	palette: any
 	hex: string
 	isLocked: boolean
@@ -206,6 +206,8 @@ export default class {
 		if (slot.isLocked) lock.classList.add('locked')
 
 		// Info
+		let infoContainer = document.createElement('div')
+		infoContainer.classList.add('info-container')
 		let info = document.createElement('div')
 		info.classList.add('info')
 		let hex = document.createElement('h2')
@@ -227,7 +229,8 @@ export default class {
 		lock.append(lockArm, lockBody)
 		copy.append(copyUse)
 		info.append(hex, copy)
-		center.append(x, lock, info)
+		infoContainer.append(info)
+		center.append(x, lock, infoContainer)
 		div.append(center, leftDetect, rightDetect)
 
 		return div

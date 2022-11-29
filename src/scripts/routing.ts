@@ -51,7 +51,7 @@ export default class {
 	}
 
 	idsAreValid(ids: string[]) {
-		for (let id of ids) if (!/^[a-f0-9]{6}$/.test(id) || ids.length > 8) return false
+		for (let id of ids) if (!/^[a-f0-9]{6}$/.test(id) || ids.length > 10) return false
 		return true
 	}
 }

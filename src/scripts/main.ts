@@ -20,9 +20,24 @@ export let router = new Router([
 router.routeToURL(location.pathname)
 setTimeout(() => {
 	;(document.querySelector(':root')! as HTMLElement).style.display = 'initial'
-	if (window.innerHeight > window.innerWidth) document.body.classList.add('vertical')
-	else document.body.classList.remove('vertical')
+	if (window.innerHeight > window.innerWidth) {
+		document.body.classList.add('vertical')
+		document.body.classList.remove('landscape-thin')
+	} else if (window.innerWidth / window.innerHeight < 1.6) {
+		document.body.classList.add('landscape-thin')
+		document.body.classList.remove('vertical')
+	} else document.body.classList.remove('vertical', 'landscape-thin')
 }, 200)
+
+onresize = () => {
+	if (window.innerHeight > window.innerWidth) {
+		document.body.classList.add('vertical')
+		document.body.classList.remove('landscape-thin')
+	} else if (window.innerWidth / window.innerHeight < 1.6) {
+		document.body.classList.add('landscape-thin')
+		document.body.classList.remove('vertical')
+	} else document.body.classList.remove('vertical', 'landscape-thin')
+}
 
 onpopstate = () => router.navigateTo(location.pathname, true)
 
@@ -39,7 +54,7 @@ onmouseover = (e) => {
 		const swatch = target.closest('.swatch')
 		if (swatch) {
 			const detector = target.closest('.detector')
-			if (detector && palette.slots.length < 8) {
+			if (detector && palette.slots.length < 10) {
 				const left = target.closest('.left')
 				let index = parseInt(swatch.getAttribute('data-color-index')!)
 				if (left) index--
@@ -49,7 +64,9 @@ onmouseover = (e) => {
 	}
 }
 
-if (local.info.firstVisit) {
+let firstVisit = local.info.firstVisit
+
+if (firstVisit == true) {
 	confirmation({ message: 'This site relies on local storage and cookies to save palettes.', value: 'cookies' }, [
 		{
 			message: `Sure, sounds good to me.`,
@@ -75,11 +92,6 @@ if (local.info.firstVisit) {
 			},
 		},
 	])
-}
-
-onresize = () => {
-	if (window.innerHeight > window.innerWidth) document.body.classList.add('vertical')
-	else document.body.classList.remove('vertical')
 }
 
 if (navigator.userAgent.includes('Android') || navigator.userAgent.includes('like Mac')) {

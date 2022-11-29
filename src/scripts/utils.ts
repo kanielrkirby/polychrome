@@ -249,7 +249,7 @@ function toolTip(message: string, options?: { pos?: [x: number, y: number]; dura
 }
 
 function popOver(
-	choices: { content?: string; id?: string; class?: string }[],
+	choices: { content?: string; id?: string; class?: string; attribute?: string[] }[],
 	options?: { type?: string; hex?: string }
 ) {
 	let div = document.createElement('div')
@@ -265,6 +265,7 @@ function popOver(
 			item.classList.add('choice')
 			if (choice.content) item.innerHTML = choice.content
 			if (choice.class) item.classList.add(choice.class)
+			if (choice.attribute) item.setAttribute(choice.attribute[0], choice.attribute[1])
 			list.append(item)
 		}
 		div.append(list)
@@ -312,8 +313,7 @@ function popOver(
 		hueBar.append(hueCurs, hueInput)
 		div.append(canvas, hueBar)
 	}
-	if (options?.type == 'tool-menu') div.style.translate = '0 -100%'
-	if (options?.type == 'tool-menu-side') div.style.translate = '100% -100%'
+	if (options?.type == 'tool-menu') div.classList.add('bottom')
 	return div
 }
 
@@ -331,7 +331,7 @@ function confirmation(
 	let overlay = document.createElement('div')
 	overlay.classList.add('overlay')
 	box.append(h2, list)
-	div.append(box, overlay)
+	div.append(box)
 	for (let { message, value, call } of options) {
 		let option = document.createElement('li')
 		option.innerHTML = message
@@ -345,8 +345,16 @@ function confirmation(
 			},
 			{ once: true }
 		)
+		option.addEventListener(
+			'touchend',
+			() => {
+				if (call) call()
+				div.remove()
+			},
+			{ once: true }
+		)
 	}
-	document.body.append(div)
+	document.body.append(div, overlay)
 }
 
 function inputField(content: string, value: string) {
@@ -368,7 +376,8 @@ function inputField(content: string, value: string) {
 	cancel.classList.add('no')
 	options.append(cancel, confirm)
 	box.append(h2, field, options)
-	div.append(box, overlay)
+	div.append(box)
+	document.body.append(overlay)
 	return div
 }
 
