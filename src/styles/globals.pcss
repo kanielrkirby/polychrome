@@ -85,20 +85,20 @@ body {
 				transition: width 0.2s, left 0.2s;
 			}
 		}
-		&:hover,
-		&:active,
-		&:focus {
-			background-color: #f0f0f0;
-			/* hover bottom border */
-			h2::after {
-				width: 100%;
-				left: 0%;
-			}
-			/* hover settings */
-			&.settings {
-				svg {
-					rotate: -15deg;
-					scale: 1.2;
+		@media (hover: hover) {
+			&:hover {
+				background-color: #f0f0f0;
+				/* hover bottom border */
+				h2::after {
+					width: 100%;
+					left: 0%;
+				}
+				/* hover settings */
+				&.settings {
+					svg {
+						rotate: -15deg;
+						scale: 1.2;
+					}
 				}
 			}
 		}
@@ -108,10 +108,10 @@ body {
 		padding: 0.5em 1.5em;
 		display: flex;
 		align-items: center;
-		&:hover,
-		&:active,
-		&:focus {
-			background-color: #f0f0f0;
+		@media (hover: hover) {
+			&:hover {
+				background-color: #f0f0f0;
+			}
 		}
 		svg {
 			margin: 0.2em 1em;
@@ -213,12 +213,13 @@ button {
 	cursor: pointer;
 	translate: -1px -1px;
 	transition: scale 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, translate 0.2s ease;
-	&:hover,
-	&:focus {
-		scale: 1.075;
-		translate: -4px -4px;
-		background-color: #cef0ff;
-		box-shadow: 4px 5px 15px #01435f80;
+	@media (hover: hover) {
+		&:hover {
+			scale: 1.075;
+			translate: -4px -4px;
+			background-color: #cef0ff;
+			box-shadow: 4px 5px 15px #01435f80;
+		}
 	}
 	&:active {
 		scale: 1.075;
@@ -294,9 +295,10 @@ button {
 			background-color: #e2e2e2;
 			user-select: none;
 			cursor: pointer;
-			&:hover,
-			&:active {
-				background-color: #c9c9c9;
+			@media (hover: hover) {
+				&:hover {
+					background-color: #c9c9c9;
+				}
 			}
 		}
 	}
@@ -316,19 +318,21 @@ button {
 			user-select: none;
 		}
 	}
-	&.import-create,
-	&.import-palettes,
-	&.settings {
-		.yes:hover {
-			color: lime;
-			background-color: black;
+	@media (hover: hover) {
+		&.import-create,
+		&.import-palettes,
+		&.settings {
+			.yes:hover {
+				color: lime;
+				background-color: black;
+			}
 		}
-	}
-	&.cookies .no,
-	&.remove-all .yes {
-		&:hover {
-			color: red;
-			background-color: black;
+		&.cookies .no,
+		&.remove-all .yes {
+			&:hover {
+				color: red;
+				background-color: black;
+			}
 		}
 	}
 }
@@ -355,9 +359,10 @@ button {
 			font-size: min(1.2em, 4vw);
 			user-select: none;
 		}
-		&:hover,
-		&:active {
-			background-color: #00000015;
+		@media (hover: hover) {
+			&:hover {
+				background-color: #00000015;
+			}
 		}
 	}
 	ul {
@@ -399,11 +404,13 @@ button {
 			background-color: #e2e2e250;
 			transition: all 0.2s;
 		}
-		&:hover {
-			background-color: transparent;
-			scale: 1.2;
-			&::after {
-				scale: 1;
+		@media (hover: hover) {
+			&:hover {
+				background-color: transparent;
+				scale: 1.2;
+				&::after {
+					scale: 1;
+				}
 			}
 		}
 	}
@@ -411,10 +418,11 @@ button {
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		&:hover,
-		&:active {
-			background-color: black;
-			color: cyan;
+		@media (hover: hover) {
+			&:hover {
+				background-color: black;
+				color: cyan;
+			}
 		}
 	}
 	&.create {
@@ -434,20 +442,26 @@ button {
 		h2 {
 			color: red;
 		}
-		&:hover {
-			background-color: black;
+		@media (hover: hover) {
+			&:hover {
+				background-color: black;
+			}
 		}
 	}
 	.import {
-		&:hover {
-			background-color: black;
-			color: cyan;
+		@media (hover: hover) {
+			&:hover {
+				background-color: black;
+				color: cyan;
+			}
 		}
 	}
 	.save {
-		&:hover {
-			background-color: black;
-			color: lime;
+		@media (hover: hover) {
+			&:hover {
+				background-color: black;
+				color: lime;
+			}
 		}
 	}
 	.add-colors {
@@ -496,8 +510,10 @@ button {
 		&:not(:last-child) {
 			border-bottom: 1px solid #e2e2e2;
 		}
-		&:hover {
-			background-color: #e2e2e2;
+		@media (hover: hover) {
+			&:hover {
+				background-color: #e2e2e2;
+			}
 		}
 	}
 }

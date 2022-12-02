@@ -135,18 +135,19 @@
 			translate: -1px -1px;
 			transition: scale 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, translate 0.2s ease;
 			text-decoration: none;
-			&:hover,
-			&:focus {
-				scale: 1.075;
-				translate: -4px -4px;
-				background-color: #006aff;
-				box-shadow: 4px 5px 15px #006aff80;
-			}
-			&:active {
-				scale: 1.075;
-				translate: 1px 1px;
-				background-color: #002196;
-				box-shadow: 1px 1px 5px #00219680;
+			@media (hover: hover) {
+				&:hover {
+					scale: 1.075;
+					translate: -4px -4px;
+					background-color: #006aff;
+					box-shadow: 4px 5px 15px #006aff80;
+				}
+				&:active {
+					scale: 1.075;
+					translate: 1px 1px;
+					background-color: #002196;
+					box-shadow: 1px 1px 5px #00219680;
+				}
 			}
 		}
 	}

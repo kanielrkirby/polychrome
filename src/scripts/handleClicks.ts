@@ -4,11 +4,10 @@ import { Slot } from './palette'
 export default function handleClicks() {
 	// Create Page Palette
 	let pal = document.querySelector('#palette')! as HTMLElement
-	pal.onclick = paletteClick
-	pal.ontouchend = paletteClick
+	pal.onclick = pal.ontouchend = paletteClick
 	let cancelClick = false
 	async function paletteClick(e: MouseEvent | TouchEvent) {
-		let target = e.target as HTMLElement
+		e.preventDefault()
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
 			focus()
@@ -18,6 +17,7 @@ export default function handleClicks() {
 			}, 75)
 		}
 
+		let target = e.target as HTMLElement
 		// Add Button
 		let add = target.closest('.plus-container svg')
 		if (add) {
@@ -139,10 +139,9 @@ export default function handleClicks() {
 
 	// Palettes Page Palette Container
 	let pals = document.querySelector('.saved-palettes-wrapper') as HTMLElement
-	pals.ontouchend = palettesClick
-	pals.onclick = palettesClick
+	pals.ontouchend = pals.onclick = palettesClick
 	async function palettesClick(e: MouseEvent | TouchEvent) {
-		let target = e.target as HTMLElement
+		e.preventDefault()
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
 			focus()
@@ -152,6 +151,7 @@ export default function handleClicks() {
 			}, 75)
 		}
 
+		let target = e.target as HTMLElement
 		// Copy Swatch
 		let swatch = target.closest('.swatch')
 		if (swatch) {
@@ -269,15 +269,13 @@ export default function handleClicks() {
 			)
 			return
 		}
-		document.querySelector('.popover')?.remove()
-		document.querySelector('.clear-overlay')?.remove()
 	}
 
 	//* Toolbar
 	let tool = document.querySelector('.toolbar') as HTMLElement
-	tool.ontouchend = toolbarClick
-	tool.onclick = toolbarClick
+	tool.ontouchend = tool.onclick = toolbarClick
 	async function toolbarClick(e: MouseEvent | TouchEvent) {
+		e.preventDefault()
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
 			focus()
@@ -358,29 +356,25 @@ export default function handleClicks() {
 	let mainNav = document.querySelector('.main-nav')!
 	let mainHeader = document.querySelector('.main-header')!
 	//* Misc
-	window.ontouchend = globalClick
-	window.onclick = globalClick
+	window.ontouchend = window.onclick = globalClick
 	async function globalClick(e: MouseEvent | TouchEvent) {
+		e.preventDefault()
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
-			focus()
 			cancelClick = true
 			setTimeout(() => {
 				cancelClick = false
 			}, 75)
 		}
 		let target = e.target as HTMLElement
-		// Overlay
-		document.querySelector('.popover')?.remove()
-		document.querySelector('.clear-overlay')?.remove()
 		// Links
 		let a = target.closest('a')
 		if (a) {
 			e.preventDefault()
 			let aLink = a.getAttribute('href')!
 			mainNav.classList.remove('visible')
-			document.querySelector('.overlay')?.remove()
 			document.body.style.overflowY = ''
+			document.querySelector('.overlay')?.remove()
 			if (aLink != location.pathname) router.navigateTo(aLink)
 			return
 		}
@@ -390,21 +384,14 @@ export default function handleClicks() {
 			if (mainNav.classList.contains('visible')) {
 				let overlay = document.createElement('div')
 				overlay.classList.add('overlay')
+				overlay.onclick = overlay.ontouchend = () => {
+					overlay.remove()
+					mainNav.classList.remove('visible')
+					document.body.style.overflowY = ''
+				}
 				mainHeader.append(overlay)
 				document.body.style.overflowY = 'hidden'
 				palette.plus.hide()
-				setTimeout(() => {
-					overlay.addEventListener(
-						'click',
-						() => {
-							overlay.remove()
-							mainNav.classList.remove('visible')
-							document.body.style.overflowY = ''
-						},
-						{ once: true }
-					)
-				}, 50)
-				document.body.style.overflowY = 'hidden'
 			} else {
 				mainHeader.querySelector('.overlay')?.remove()
 				document.body.style.overflowY = ''
@@ -430,8 +417,6 @@ export default function handleClicks() {
 							).selectedIndex
 							local.settings = pendingSettings
 							document.body.append(toolTip('Changes saved.'))
-							document.querySelector('.main-nav')!.classList.remove('visible')
-							document.querySelector('.overlay')?.remove()
 						},
 					},
 					cancel: {

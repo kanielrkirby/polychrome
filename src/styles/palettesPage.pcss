@@ -1,9 +1,11 @@
 .palettes-page {
 	height: 100%;
+	max-width: 100%;
 	.saved-palettes-wrapper {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, 24em);
+		grid-template-columns: repeat(auto-fit, 24em);
 		justify-content: space-around;
+		justify-items: center;
 		max-width: 100%;
 		min-height: fit-content;
 		gap: 2em;
@@ -47,12 +49,13 @@
 			translate: -1px -1px;
 			transition: scale 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, translate 0.2s ease;
 			text-decoration: none;
-			&:hover,
-			&:focus {
-				scale: 1.075;
-				translate: -4px -4px;
-				background-color: #006aff;
-				box-shadow: 4px 5px 15px #006aff80;
+			@media (hover: hover) {
+				&:hover {
+					scale: 1.075;
+					translate: -4px -4px;
+					background-color: #006aff;
+					box-shadow: 4px 5px 15px #006aff80;
+				}
 			}
 			&:active {
 				scale: 1.075;
@@ -76,12 +79,12 @@
 		height: fit-content;
 		padding: 0.25em;
 		width: min(24em, 95vw);
+		max-width: 95vw;
 	}
 	.palette {
 		user-select: none;
 		display: flex;
 		height: 8em;
-		min-width: 24em;
 		border-radius: 15px;
 		overflow: hidden;
 		box-shadow: 1px 1px 15px 2px #00000050;
@@ -149,10 +152,12 @@
 				background-color: #e2e2e250;
 				transition: all 0.2s;
 			}
-			&:hover {
-				scale: 1.2;
-				&::after {
-					scale: 1;
+			@media (hover: hover) {
+				&:hover {
+					scale: 1.2;
+					&::after {
+						scale: 1;
+					}
 				}
 			}
 		}

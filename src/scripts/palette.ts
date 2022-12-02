@@ -29,7 +29,7 @@ export default class {
 				if (!slot) {
 					slot = this.palette.slots[index + 1]
 					let contextDiv = document.getElementById(slot.id)
-					contextDiv!.before(plusDiv)
+					contextDiv?.before(plusDiv)
 				} else {
 					let contextDiv = document.getElementById(slot.id)
 					contextDiv!.after(plusDiv)
@@ -39,6 +39,9 @@ export default class {
 		},
 		hide(amount?: number) {
 			if (this.active) {
+				document.getElementById('plus-button')?.parentElement!.parentElement!.remove()
+				this.active = false
+				if (this.disabled) return
 				this.disabled = true
 				setTimeout(
 					() => {
@@ -46,8 +49,6 @@ export default class {
 					},
 					typeof amount == 'number' ? amount : 300
 				)
-				document.getElementById('plus-button')?.parentElement!.parentElement!.remove()
-				this.active = false
 			}
 		},
 		render(data: string) {

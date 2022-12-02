@@ -205,6 +205,11 @@ function popOver(
 	document.body.append(overlay)
 	let list = document.createElement('ul')
 	list.classList.add('list')
+	let remove = () => {
+		overlay.remove()
+		div.remove()
+	}
+	overlay.onclick = overlay.ontouchend = remove
 	if (choices)
 		for (let { message, classes, attributes, call } of choices) {
 			let item = document.createElement('div')
@@ -214,13 +219,9 @@ function popOver(
 			if (attributes) for (let attribute of attributes) item.setAttribute(attribute[0], attribute[1])
 			list.append(item)
 			div.append(list)
-			item.onclick = () => {
+			item.onclick = item.ontouchend = () => {
 				if (call) call()
-				document.querySelector('.clear-overlay')!.remove()
-			}
-			item.ontouchend = () => {
-				if (call) call()
-				document.querySelector('.clear-overlay')!.remove()
+				remove()
 			}
 		}
 	return div
@@ -245,6 +246,12 @@ function confirmation(
 	h2.innerHTML = message
 	let overlay = document.createElement('div')
 	overlay.classList.add('overlay')
+	let remove = () => {
+		document.querySelector('.main-nav')!.classList.remove('visible')
+		div.remove()
+		document.querySelector('.overlay')?.remove()
+	}
+	overlay.onclick = overlay.ontouchend = remove
 	let box = document.createElement('div')
 	box.classList.add('box')
 	box.append(h2)
@@ -260,16 +267,14 @@ function confirmation(
 		cancel.innerHTML = options?.confirmation?.cancel.message || 'Cancel'
 		let call = () => {
 			if (options?.confirmation?.confirm.call) options.confirmation.confirm.call()
-			div.remove()
+			remove()
 		}
 		let call2 = () => {
 			if (options?.confirmation?.cancel.call) options.confirmation.cancel.call()
-			div.remove()
+			remove()
 		}
-		confirm.onclick = call
-		confirm.ontouchend = call
-		cancel.onclick = call2
-		cancel.ontouchend = call2
+		confirm.onclick = confirm.ontouchend = call
+		cancel.onclick = cancel.ontouchend = call2
 		confirmationElement.append(cancel, confirm)
 		return confirmationElement
 	}
