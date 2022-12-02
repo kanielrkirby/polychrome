@@ -1,7 +1,3 @@
-import { v4 as uuidv4 } from 'uuid'
-
-const siteTitle = document.title
-
 function deconstructHex(hex: string) {
 	let r = parseInt(hex[0] + hex[1], 16) / 255,
 		g = parseInt(hex[2] + hex[3], 16) / 255,
@@ -12,7 +8,6 @@ function deconstructHex(hex: string) {
 		s,
 		lum = r * 0.299 + g * 0.587 + b * 0.114,
 		l = (max + min) / 2
-
 	if (max == min) h = s = 0
 	else {
 		let d = max - min
@@ -31,25 +26,6 @@ function deconstructHex(hex: string) {
 		h = h * 60
 	}
 	return { r, g, b, h, s, l, lum }
-}
-
-function hslToHex(h: number, s: number, l: number) {
-	if (h > 360) h -= 360
-	else if (h < 0) h += 360
-	if (s > 1) s = 1
-	else if (s < 0) s = 0
-	if (l > 1) l = 1
-	else if (l < 0) l = 0
-	s *= 100
-	const a = (s * Math.min(l, 1 - l)) / 100
-	const f: any = (n: any) => {
-		const k = (n + h / 30) % 12
-		const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
-		return Math.round(255 * color)
-			.toString(16)
-			.padStart(2, '0')
-	}
-	return `${f(0)}${f(8)}${f(4)}`
 }
 
 const local = {
@@ -83,8 +59,8 @@ const local = {
 			localStorage.setItem(
 				'settings',
 				JSON.stringify({
-					lastColorAlgorithmIndex: 2,
-					cookiesOk: false,
+					algorithm: 2,
+					cookies: 0,
 				})
 			)
 			return this.settings
@@ -168,43 +144,7 @@ const session = {
 	},
 }
 
-const toolbar = document.querySelector('.toolbar')!
-function pageFactory(title: string, element: HTMLElement, context?: any): Function {
-	return (ids?: string[]) => {
-		document.title = siteTitle + ' | ' + title
-		const currentView = document.querySelector('main.visible')
-		if (currentView) currentView.classList.remove('visible')
-		const nextView = element
-		nextView?.classList.add('visible')
-		if (title == 'Palettes') {
-			document.body.parentElement!.style.overflow = ''
-			document.body.style.overflow = ''
-			toolbar.classList.add('palettes')
-			toolbar.classList.remove('create')
-			context.draw(local.savedPalettes.items)
-		} else if (title == 'Create') {
-			document.body.parentElement!.style.overflow = 'hidden'
-			document.body.style.overflow = 'hidden'
-			toolbar.classList.add('create')
-			toolbar.classList.remove('palettes')
-			if (ids) context.generate(ids)
-			else {
-				let slots = context.generate()
-				let hexes = []
-				for (let slot of slots) hexes.push(slot.hex)
-				history.replaceState('', '', hexes.join('-'))
-			}
-		} else {
-			toolbar.classList.remove('palettes', 'create')
-			document.documentElement.style.overflow = ''
-			document.body.style.overflow = ''
-		}
-	}
-}
-
 const random = (min: number, max: number) => Math.random() * (max - min) + min
-
-const uuid = () => btoa(parseInt(uuidv4(), 16).toString(36)).replaceAll('=', '')
 
 function toolTip(message: string, options?: { pos?: [x: number, y: number]; duration?: number }) {
 	const tip = document.createElement('div')
@@ -212,22 +152,16 @@ function toolTip(message: string, options?: { pos?: [x: number, y: number]; dura
 	const text = document.createElement('h2')
 	text.innerHTML = message
 	tip.append(text)
-	if (options?.pos) {
+	if (options?.pos && !(navigator.userAgent.includes('Android') || navigator.userAgent.includes('like Mac'))) {
 		tip.style.left = options.pos[0] + 'px'
 		tip.style.top = options.pos[1] + 'px'
-	} else tip.classList.add('centered')
-	setTimeout(() => {
-		if (options && options.pos) {
-			if (tip.clientWidth + options.pos[0] > document.body.clientWidth) {
+		setTimeout(() => {
+			if (tip.clientWidth + options.pos![0] > document.body.clientWidth) {
 				tip.style.translate = '-100%'
-				if (tip.clientHeight + options.pos[1] > document.body.clientHeight) {
-					tip.style.translate = '-100 -100%'
-				}
-			} else if (tip.clientHeight + options.pos[1] > document.body.clientHeight) {
-				tip.style.translate = '0 -100%'
-			}
-		}
-	}, 0)
+				if (tip.clientHeight + options.pos![1] > document.body.clientHeight) tip.style.translate = '-100 -100%'
+			} else if (tip.clientHeight + options.pos![1] > document.body.clientHeight) tip.style.translate = '0 -100%'
+		}, 0)
+	} else tip.classList.add('centered')
 	tip.addEventListener(
 		'animationend',
 		() => {
@@ -249,265 +183,127 @@ function toolTip(message: string, options?: { pos?: [x: number, y: number]; dura
 }
 
 function popOver(
-	choices: { content?: string; id?: string; class?: string; attribute?: string[] }[],
-	options?: { type?: string; hex?: string }
+	choices: { message: string; call?: Function; classes?: string[]; attributes?: string[][] }[],
+	options?: { type?: string }
 ) {
 	let div = document.createElement('div')
 	div.classList.add('popover')
+	let obs = new IntersectionObserver(
+		(entries) => {
+			let entry = entries[0]
+			if (!entry.isIntersecting && entry.intersectionRatio < 1) div.style.translate = '0 -100%'
+		},
+		{ threshold: 1 }
+	)
+	obs.observe(div)
+	setTimeout(() => {
+		obs.unobserve(div)
+	}, 10)
+	if (options?.type == 'tool-menu') div.classList.add('bottom')
 	let overlay = document.createElement('div')
 	overlay.classList.add('clear-overlay')
-	if (options?.type == 'menu' || options?.type == 'tool-menu' || options?.type == 'tool-menu-side') {
-		let list = document.createElement('ul')
-		list.classList.add('list')
-		for (let choice of choices) {
+	document.body.append(overlay)
+	let list = document.createElement('ul')
+	list.classList.add('list')
+	if (choices)
+		for (let { message, classes, attributes, call } of choices) {
 			let item = document.createElement('div')
-			if (choice.id) item.id = choice.id
 			item.classList.add('choice')
-			if (choice.content) item.innerHTML = choice.content
-			if (choice.class) item.classList.add(choice.class)
-			if (choice.attribute) item.setAttribute(choice.attribute[0], choice.attribute[1])
+			item.innerHTML = message
+			if (classes) for (let className of classes) item.classList.add(className)
+			if (attributes) for (let attribute of attributes) item.setAttribute(attribute[0], attribute[1])
 			list.append(item)
+			div.append(list)
+			item.onclick = () => {
+				if (call) call()
+				document.querySelector('.clear-overlay')!.remove()
+			}
+			item.ontouchend = () => {
+				if (call) call()
+				document.querySelector('.clear-overlay')!.remove()
+			}
 		}
-		div.append(list)
-		document.body.append(overlay)
-	} else if (options?.type == 'color-picker') {
-		let canvas = document.createElement('canvas')
-		canvas.id = 'color-picker'
-		canvas.classList.add('color-picker')
-		let ctx = canvas.getContext('2d')!
-
-		let { h } = deconstructHex(options.hex!)
-		let color = `hsl(${h}, 100%, 50%)`
-		let gH = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0)
-		gH.addColorStop(0, '#fff')
-		gH.addColorStop(1, color)
-		ctx.fillStyle = gH
-		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-		let gV = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height)
-		gV.addColorStop(0, 'rgba(0,0,0,0)')
-		gV.addColorStop(1, 'black')
-		ctx.fillStyle = gV
-		ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-		let canvCurs = document.createElement('div')
-		canvCurs.classList.add('color-picker-cursor')
-
-		let canvInput = document.createElement('input')
-		canvInput.setAttribute('min', '0')
-		canvInput.setAttribute('max', '360')
-		canvInput.setAttribute('type', 'range')
-
-		let hueBar = document.createElement('div')
-		hueBar.classList.add('huebar')
-
-		let hueCurs = document.createElement('div')
-		hueCurs.classList.add('huebar-cursor')
-
-		let hueInput = document.createElement('input')
-		hueInput.setAttribute('min', '0')
-		hueInput.setAttribute('max', '360')
-		hueInput.setAttribute('type', 'range')
-
-		canvas.append(canvCurs, canvInput)
-		hueBar.append(hueCurs, hueInput)
-		div.append(canvas, hueBar)
-	}
-	if (options?.type == 'tool-menu') div.classList.add('bottom')
 	return div
 }
 
 function confirmation(
-	message: { message: string; value: string },
-	options: { message: string; value: string; call?: Function }[]
+	message: string,
+	options?: {
+		settings?: { message: string; value: string; choices: { message: string; value?: string | number }[] }[]
+		confirmation?: {
+			value?: string
+			confirm: { message: string; call?: Function }
+			cancel: { message: string; call?: Function }
+		}
+		choices?: { message: string; value: string; call?: Function }[]
+		type?: string
+	}
 ) {
 	let div = document.createElement('div')
-	div.classList.add('confirmation-screen', message.value + '-confirmation')
-	let box = document.createElement('div')
-	box.classList.add('box')
+	div.classList.add('confirmation-screen')
 	let h2 = document.createElement('h2')
-	h2.innerHTML = message.message
-	let list = document.createElement('ul')
+	h2.innerHTML = message
 	let overlay = document.createElement('div')
 	overlay.classList.add('overlay')
-	box.append(h2, list)
-	div.append(box)
-	for (let { message, value, call } of options) {
-		let option = document.createElement('li')
-		option.innerHTML = message
-		option.classList.add(value)
-		list.append(option)
-		option.addEventListener(
-			'click',
-			() => {
-				if (call) call()
-				div.remove()
-			},
-			{ once: true }
-		)
-		option.addEventListener(
-			'touchend',
-			() => {
-				if (call) call()
-				div.remove()
-			},
-			{ once: true }
-		)
+	let box = document.createElement('div')
+	box.classList.add('box')
+	box.append(h2)
+	div.append(box, overlay)
+	function confirmationElem() {
+		if (options?.confirmation?.value) div.classList.add(options.confirmation.value)
+		let confirmationElement = document.createElement('ul')
+		let confirm = document.createElement('li')
+		confirm.classList.add('yes')
+		confirm.innerHTML = options?.confirmation?.confirm.message || 'Confirm'
+		let cancel = document.createElement('li')
+		cancel.classList.add('no')
+		cancel.innerHTML = options?.confirmation?.cancel.message || 'Cancel'
+		let call = () => {
+			if (options?.confirmation?.confirm.call) options.confirmation.confirm.call()
+			div.remove()
+		}
+		let call2 = () => {
+			if (options?.confirmation?.cancel.call) options.confirmation.cancel.call()
+			div.remove()
+		}
+		confirm.onclick = call
+		confirm.ontouchend = call
+		cancel.onclick = call2
+		cancel.ontouchend = call2
+		confirmationElement.append(cancel, confirm)
+		return confirmationElement
 	}
-	document.body.append(div, overlay)
+	if (options?.type == 'input') {
+		let field = document.createElement('textarea')
+		box.append(field)
+	}
+	if (options) {
+		if (options.settings) {
+			let settings = document.createElement('ul')
+			settings.classList.add('options')
+			for (let { message, value, choices } of options.settings) {
+				let settingElement = document.createElement('li')
+				let settingHeading = document.createElement('label')
+				settingHeading.innerText = message
+				let settingChoices = document.createElement('select')
+				settingChoices.id = value
+				let i = 0
+				for (let { message, value } of choices) {
+					let choice = document.createElement('option')
+					choice.innerText = message
+					choice.id = (typeof value == 'number' ? value : i).toString()
+					i++
+					settingChoices.append(choice)
+				}
+				settingChoices.selectedIndex = local.settings[value]
+				settingElement.append(settingHeading, settingChoices)
+				settings.append(settingElement)
+			}
+			box.append(settings)
+		}
+	}
+	box.append(confirmationElem())
+	document.body.append(div)
 }
 
-function inputField(content: string, value: string) {
-	let div = document.createElement('div')
-	div.classList.add('confirmation-screen', value)
-	let h2 = document.createElement('h2')
-	h2.innerHTML = content
-	let field = document.createElement('textarea')
-	let overlay = document.createElement('div')
-	overlay.classList.add('overlay')
-	let box = document.createElement('div')
-	box.classList.add('box')
-	let options = document.createElement('ul')
-	let confirm = document.createElement('li')
-	confirm.classList.add('yes')
-	confirm.innerHTML = 'Confirm'
-	let cancel = document.createElement('li')
-	cancel.innerHTML = 'Cancel'
-	cancel.classList.add('no')
-	options.append(cancel, confirm)
-	box.append(h2, field, options)
-	div.append(box)
-	document.body.append(overlay)
-	return div
-}
-
-function settingsPopover() {
-	let div = document.createElement('div')
-	div.classList.add('confirmation-screen', 'settings-popover')
-	let box = document.createElement('div')
-	box.classList.add('box')
-	let overlay = document.createElement('div')
-	overlay.classList.add('overlay')
-	let heading = document.createElement('h2')
-	heading.innerText = 'Settings'
-	let options = document.createElement('ul')
-	options.classList.add('options')
-	let algorithm = document.createElement('li')
-	let algLabel = document.createElement('label')
-	algLabel.innerText = 'Algorithm'
-	let algChoices = document.createElement('select')
-	algChoices.id = 'algorithm'
-	let random = document.createElement('option')
-	random.value = 'random'
-	random.innerText = 'Random Algorithm'
-	let monochromatic = document.createElement('option')
-	monochromatic.value = 'monochromatic'
-	monochromatic.innerText = 'Monochromatic'
-	let analogous = document.createElement('option')
-	analogous.value = 'analogous'
-	analogous.innerText = 'Analogous'
-	let complementary = document.createElement('option')
-	complementary.value = 'complementary'
-	complementary.innerText = 'Complementary'
-	let splitComplementary = document.createElement('option')
-	splitComplementary.value = 'split-complementary'
-	splitComplementary.innerText = 'Split Complementary'
-	let triadic = document.createElement('option')
-	triadic.value = 'triadic'
-	triadic.innerText = 'Triadic'
-	let tetradic = document.createElement('option')
-	tetradic.value = 'tetradic'
-	tetradic.innerText = 'Tetradic'
-	let square = document.createElement('option')
-	square.value = 'square'
-	square.innerText = 'Square'
-	let randomize = document.createElement('option')
-	randomize.value = 'randomize'
-	randomize.innerText = 'Randomize Colors'
-
-	let confirmation = document.createElement('ul')
-	confirmation.classList.add('confirmation')
-	let confirm = document.createElement('li')
-	confirm.classList.add('yes')
-	confirm.innerText = 'Confirm'
-	let cancel = document.createElement('li')
-	cancel.classList.add('no')
-	cancel.innerText = 'Cancel'
-
-	confirmation.append(cancel, confirm)
-	algChoices.append(
-		randomize,
-		monochromatic,
-		analogous,
-		complementary,
-		splitComplementary,
-		triadic,
-		tetradic,
-		square,
-		random
-	)
-	algChoices.selectedIndex = local.settings.lastColorAlgorithmIndex
-
-	let cookies = document.createElement('li')
-	cookies.classList.add('horizontal')
-	let cookiesChoices = document.createElement('div')
-	let cookiesLabel = document.createElement('label')
-	cookiesLabel.innerText = 'Cookies'
-	let cookiesOkLabel = document.createElement('label')
-	cookiesOkLabel.innerText = `That's fine!`
-	cookiesOkLabel.setAttribute('for', 'cookies-ok')
-	let cookiesNotOkLabel = document.createElement('label')
-	cookiesNotOkLabel.innerText = `No thanks.`
-	cookiesNotOkLabel.setAttribute('for', 'cookies-not-ok')
-	let op1 = document.createElement('div')
-	let op2 = document.createElement('div')
-	op1.classList.add('op')
-	op2.classList.add('op')
-	let cookiesOk = document.createElement('input')
-	cookiesOk.id = 'cookies-ok'
-	cookiesOk.value = 'cookies-ok'
-	cookiesOk.setAttribute('type', 'radio')
-	cookiesOk.classList.add('true')
-	let cookiesNotOk = document.createElement('input')
-	cookiesNotOk.id = 'cookies-not-ok'
-	cookiesNotOk.value = 'cookies-not-ok'
-	cookiesNotOk.setAttribute('type', 'radio')
-	cookiesNotOk.classList.add('false')
-	if (local.settings.cookiesOk) cookiesOk.checked = true
-	else cookiesNotOk.checked = true
-	cookiesOk.addEventListener('change', () => {
-		if (cookiesOk.checked) cookiesNotOk.checked = false
-		else cookiesNotOk.checked = true
-	})
-
-	cookiesNotOk.addEventListener('change', () => {
-		if (cookiesNotOk.checked) cookiesOk.checked = false
-		else cookiesOk.checked = true
-	})
-
-	op1.append(cookiesOk, cookiesOkLabel)
-	op2.append(cookiesNotOk, cookiesNotOkLabel)
-	cookies.append(cookiesLabel, cookiesChoices)
-	cookiesChoices.append(op1, op2)
-
-	algorithm.append(algLabel, algChoices)
-	options.append(algorithm, cookies)
-	box.append(heading, options, confirmation)
-	div.append(overlay, box)
-	return div
-}
-
-export {
-	local,
-	session,
-	uuid,
-	random,
-	hslToHex,
-	deconstructHex,
-	pageFactory,
-	toolTip,
-	popOver,
-	confirmation,
-	inputField,
-	settingsPopover,
-}
+export { local, session, random, deconstructHex, toolTip, popOver, confirmation }

@@ -1,5 +1,7 @@
 import colorAlgorithms from './colorAlgorithms'
-import { deconstructHex, local, uuid } from './utils'
+import { deconstructHex, local } from './utils'
+import { v4 as uuidv4 } from 'uuid'
+
 let pal = document.getElementById('palette')!
 
 export type Slot = {
@@ -77,8 +79,7 @@ export default class {
 		get(type?: string) {
 			if (type == 'slot') this.details = 'slot'
 			else this.details = ''
-			let index = local.settings.lastColorAlgorithmIndex
-			if (typeof index != 'number') local.settings = { lastColorAlgorithmIndex: 1 }
+			let index = local.settings.algorithm
 			return this.list[index]
 		},
 		details: '',
@@ -121,7 +122,7 @@ export default class {
 			palette: this,
 			hex: slot.hex!,
 			isLocked: typeof slot.isLocked == 'boolean' ? slot.isLocked : false,
-			id: slot.id || uuid(),
+			id: slot.id || btoa(parseInt(uuidv4(), 16).toString(36)).replaceAll('=', ''),
 			index: typeof slot.index != 'number' ? this.slots.length : slot.index,
 			get data() {
 				let d = parseInt(document.getElementById(this.id)?.getAttribute('data-color-index')!)

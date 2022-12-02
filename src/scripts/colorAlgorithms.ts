@@ -1,4 +1,23 @@
-import { hslToHex, deconstructHex, random } from './utils'
+import { deconstructHex, random } from './utils'
+
+function hslToHex(h: number, s: number, l: number) {
+	if (h > 360) h -= 360
+	else if (h < 0) h += 360
+	if (s > 1) s = 1
+	else if (s < 0) s = 0
+	if (l > 1) l = 1
+	else if (l < 0) l = 0
+	s *= 100
+	const a = (s * Math.min(l, 1 - l)) / 100
+	const f: any = (n: any) => {
+		const k = (n + h / 30) % 12
+		const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1)
+		return Math.round(255 * color)
+			.toString(16)
+			.padStart(2, '0')
+	}
+	return `${f(0)}${f(8)}${f(4)}`
+}
 
 function randomize(palette: any) {
 	if (palette.algorithm.details == 'slot') {

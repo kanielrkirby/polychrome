@@ -194,31 +194,6 @@ body {
 	}
 }
 
-.settings-menu {
-	list-style: none;
-	display: none;
-	position: fixed;
-	z-index: 0;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	margin: auto;
-	width: 70%;
-	height: 70%;
-	scale: 0;
-	transition: width 0.2s, height 0.2s;
-	@media (--desktop) {
-		width: 100%;
-		height: 100%;
-	}
-	background-color: gray;
-	&.expand {
-		display: flex;
-		animation: menu-expand 0.2s forwards;
-	}
-}
-
 main {
 	display: none;
 	&.visible {
@@ -291,6 +266,7 @@ button {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	max-width: 100%;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -299,7 +275,8 @@ button {
 	.box {
 		z-index: 110;
 		width: fit-content;
-		max-width: 60ch;
+		width: 50ch;
+		max-width: 100%;
 		padding: 1em;
 		height: fit-content;
 		background: #f2f2f2;
@@ -331,42 +308,25 @@ button {
 		justify-content: space-around;
 		li {
 			display: flex;
+			justify-content: space-between;
 			list-style: none;
 			padding: 1em;
 			border-radius: 0.2em;
 			background-color: #e2e2e2;
 			user-select: none;
-			&.horizontal {
-				flex-direction: row;
-				justify-content: space-between;
-				align-items: center;
-				div:not(.op) {
-					gap: 1em;
-					display: flex;
-					flex-direction: column;
-					.op {
-						display: flex;
-						flex-direction: row;
-					}
-				}
-			}
 		}
 	}
 	&.import-create,
 	&.import-palettes,
-	&.settings-popover {
-		.yes {
-			&:hover,
-			&:active {
-				color: lime;
-				background-color: black;
-			}
+	&.settings {
+		.yes:hover {
+			color: lime;
+			background-color: black;
 		}
 	}
-	&.cookies-confirmation .no,
-	&.remove-all-confirmation .yes {
-		&:hover,
-		&:active {
+	&.cookies .no,
+	&.remove-all .yes {
+		&:hover {
 			color: red;
 			background-color: black;
 		}
