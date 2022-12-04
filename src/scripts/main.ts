@@ -86,7 +86,7 @@ if (local.info.firstVisit)
 // Window Size
 if (navigator.userAgent.includes('Android') || navigator.userAgent.includes('like Mac'))
 	document.body.classList.add('mobile')
-function testSize() {
+export function testSize() {
 	;(document.querySelector(':root')! as HTMLElement).style.display = 'initial'
 	if (window.innerHeight > window.innerWidth) {
 		document.body.classList.add('vertical')

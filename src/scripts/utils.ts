@@ -1,3 +1,5 @@
+import { testSize } from './main'
+
 function deconstructHex(hex: string) {
 	let r = parseInt(hex[0] + hex[1], 16) / 255,
 		g = parseInt(hex[2] + hex[3], 16) / 255,
@@ -182,6 +184,8 @@ function toolTip(message: string, options?: { pos?: [x: number, y: number]; dura
 	return tip
 }
 
+let cancelClick = false
+
 function popOver(
 	choices: { message: string; call?: Function; classes?: string[]; attributes?: string[][] }[],
 	options?: { type?: string }
@@ -209,7 +213,14 @@ function popOver(
 		overlay.remove()
 		div.remove()
 	}
-	overlay.onclick = overlay.ontouchend = remove
+	overlay.onclick = overlay.ontouchend = () => {
+		if (cancelClick) return
+		cancelClick = true
+		setTimeout(() => {
+			cancelClick = false
+		}, 75)
+		remove()
+	}
 	if (choices)
 		for (let { message, classes, attributes, call } of choices) {
 			let item = document.createElement('div')
@@ -219,10 +230,17 @@ function popOver(
 			if (attributes) for (let attribute of attributes) item.setAttribute(attribute[0], attribute[1])
 			list.append(item)
 			div.append(list)
-			item.onclick = item.ontouchend = () => {
-				if (call) call()
-				remove()
-			}
+			setTimeout(() => {
+				item.onclick = item.ontouchend = () => {
+					if (cancelClick) return
+					cancelClick = true
+					setTimeout(() => {
+						cancelClick = false
+					}, 75)
+					if (call) call()
+					remove()
+				}
+			}, 25)
 		}
 	return div
 }
@@ -250,6 +268,7 @@ function confirmation(
 		document.querySelector('.main-nav')!.classList.remove('visible')
 		div.remove()
 		document.querySelector('.overlay')?.remove()
+		setTimeout(testSize, 50)
 	}
 	overlay.onclick = overlay.ontouchend = remove
 	let box = document.createElement('div')

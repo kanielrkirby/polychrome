@@ -3,19 +3,15 @@ import { session, toolTip, popOver, local, confirmation } from './utils'
 import { Slot } from './palette'
 export default function handleClicks() {
 	// Create Page Palette
+	let cancelClick = false
 	let pal = document.querySelector('#palette')! as HTMLElement
 	pal.onclick = pal.ontouchend = paletteClick
-	let cancelClick = false
 	async function paletteClick(e: MouseEvent | TouchEvent) {
-		e.preventDefault()
 		if (cancelClick) return
-		if ((e as PointerEvent).pointerType != 'mouse') {
-			focus()
-			cancelClick = true
-			setTimeout(() => {
-				cancelClick = false
-			}, 75)
-		}
+		cancelClick = true
+		setTimeout(() => {
+			cancelClick = false
+		}, 75)
 
 		let target = e.target as HTMLElement
 		// Add Button
@@ -141,21 +137,16 @@ export default function handleClicks() {
 	let pals = document.querySelector('.saved-palettes-wrapper') as HTMLElement
 	pals.ontouchend = pals.onclick = palettesClick
 	async function palettesClick(e: MouseEvent | TouchEvent) {
-		e.preventDefault()
 		if (cancelClick) return
-		if ((e as PointerEvent).pointerType != 'mouse') {
-			focus()
-			cancelClick = true
-			setTimeout(() => {
-				cancelClick = false
-			}, 75)
-		}
+		cancelClick = true
+		setTimeout(() => {
+			cancelClick = false
+		}, 75)
 
 		let target = e.target as HTMLElement
 		// Copy Swatch
 		let swatch = target.closest('.swatch')
 		if (swatch) {
-			e.preventDefault()
 			let pal = swatch.parentElement!.parentElement!
 			await navigator.clipboard
 				.writeText(
@@ -277,13 +268,10 @@ export default function handleClicks() {
 	async function toolbarClick(e: MouseEvent | TouchEvent) {
 		e.preventDefault()
 		if (cancelClick) return
-		if ((e as PointerEvent).pointerType != 'mouse') {
-			focus()
-			cancelClick = true
-			setTimeout(() => {
-				cancelClick = false
-			}, 75)
-		}
+		cancelClick = true
+		setTimeout(() => {
+			cancelClick = false
+		}, 75)
 
 		let target = e.target as HTMLElement
 		// Undo Button
@@ -359,51 +347,24 @@ export default function handleClicks() {
 	window.ontouchend = window.onclick = globalClick
 	async function globalClick(e: MouseEvent | TouchEvent) {
 		if (!cancelClick) {
-			if ((e as PointerEvent).pointerType != 'mouse') {
-				cancelClick = true
-				setTimeout(() => {
-					cancelClick = false
-				}, 75)
-			}
-			let target = e.target as HTMLElement
-			// Links
-			let a = target.closest('a')
-			if (a) {
-				e.preventDefault()
-				let aLink = a.getAttribute('href')!
-				mainNav.classList.remove('visible')
-				document.body.style.overflowY = ''
-				document.querySelector('.overlay')?.remove()
-				if (aLink != location.pathname) router.navigateTo(aLink)
-				return
-			}
+			cancelClick = true
+			setTimeout(() => {
+				cancelClick = false
+			}, 75)
 
-			if (target.closest('#nav-button')) {
-				mainNav.classList.toggle('visible')
-				if (mainNav.classList.contains('visible')) {
-					let overlay = document.createElement('div')
-					overlay.classList.add('overlay')
-					overlay.onclick = overlay.ontouchend = () => {
-						overlay.remove()
-						mainNav.classList.remove('visible')
-						document.body.style.overflowY = ''
-					}
-					mainHeader.append(overlay)
-					document.body.style.overflowY = 'hidden'
-					palette.plus.hide()
-				} else {
-					mainHeader.querySelector('.overlay')?.remove()
-					document.body.style.overflowY = ''
-				}
-			}
+			let target = e.target as HTMLElement
 
 			// Settings Button
 			if (target.closest('#settings')) {
+				e.preventDefault()
 				confirmation('Settings', {
 					confirmation: {
 						confirm: {
 							message: 'Confirm',
 							call() {
+								if (cancelClick) return
+								cancelClick = true
+								setTimeout(() => (cancelClick = false), 75)
 								let pendingSettings = local.settings
 								let element = document.querySelector('.confirmation-screen .box ul.options')!.firstChild! as HTMLElement
 								for (let key of Object.keys(pendingSettings)) {
@@ -421,6 +382,9 @@ export default function handleClicks() {
 						cancel: {
 							message: 'Cancel',
 							call() {
+								if (cancelClick) return
+								cancelClick = true
+								setTimeout(() => (cancelClick = false), 75)
 								document.body.append(toolTip('Changes discarded.'))
 							},
 						},
@@ -496,6 +460,36 @@ export default function handleClicks() {
 					}
 					return
 				}
+			}
+
+			// Links
+			let a = target.closest('a')
+			if (a) {
+				e.preventDefault()
+				let aLink = a.getAttribute('href')!
+				mainNav.classList.remove('visible')
+				document.body.style.overflowY = ''
+				document.querySelector('.overlay')?.remove()
+				if (aLink != location.pathname) router.navigateTo(aLink)
+				return
+			}
+
+			if (target.closest('#nav-button')) {
+				mainNav.classList.add('visible')
+				let overlay = document.createElement('div')
+				overlay.classList.add('overlay')
+				mainHeader.append(overlay)
+				document.body.style.overflowY = 'hidden'
+				palette.plus.hide()
+				overlay.onclick = overlay.ontouchend = () => {
+					if (cancelClick) return
+					cancelClick = true
+					setTimeout(() => (cancelClick = false), 75)
+					overlay.remove()
+					mainNav.classList.remove('visible')
+					document.body.style.overflowY = ''
+				}
+				return
 			}
 		}
 	}
@@ -584,6 +578,7 @@ function addColorsButton() {
 	for (let i = palette.slots.length + 4; i > 10; i--) array.pop()
 	if (array.length < 1) {
 		document.body.append(toolTip('Too many colors!'))
+		document.querySelector('popover')?.remove()
 		return
 	}
 	document.body.append(popOver(array, { type: 'tool-menu' }))
