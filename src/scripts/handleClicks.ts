@@ -22,19 +22,19 @@ export default function handleClicks() {
 			const addIndex = parseInt(add.getAttribute('data-color-index')!)
 			let slot = palette.addSlot({ index: addIndex + 1 })
 			ids!.splice(addIndex + 1, 0, slot.hex)
-			history.replaceState('', '', ids!.join('-'))
+			history.replaceState('', '', '/polychrome/create/' + ids!.join('-'))
 			palette.plus.hide()
 			session.create.push({
 				undo() {
 					palette.removeSlot(slot, { animations: false })
 					ids!.splice(addIndex + 1, 1)
-					history.replaceState('', '', ids!.join('-'))
+					history.replaceState('', '', '/polychrome/create/' + ids!.join('-'))
 					palette.plus.hide()
 				},
 				redo() {
 					palette.addSlot(slot, { animations: false })
 					ids!.splice(addIndex + 1, 0, slot.hex)
-					history.replaceState('', '', ids!.join('-'))
+					history.replaceState('', '', '/polychrome/create/' + ids!.join('-'))
 					palette.plus.hide()
 				},
 			})
@@ -302,16 +302,16 @@ export default function handleClicks() {
 			palette.generate()
 			let ids: string[] = []
 			for (let { hex } of palette.slots) ids.push(hex)
-			history.replaceState('', '', '/create/' + ids.join('-'))
+			history.replaceState('', '', '/polychrome/create/' + ids.join('-'))
 			if (prevIds)
 				session.create.push({
 					undo: () => {
 						palette.generate(prevIds)
-						history.replaceState('', '', '/create/' + prevIds.join('-'))
+						history.replaceState('', '', '/polychrome/create/' + prevIds.join('-'))
 					},
 					redo: () => {
 						palette.generate(ids)
-						history.replaceState('', '', '/create/' + ids.join('-'))
+						history.replaceState('', '', '/polychrome/create/' + ids.join('-'))
 					},
 				})
 			return
