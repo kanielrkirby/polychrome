@@ -191,13 +191,13 @@ function popOver(
 	let obs = new IntersectionObserver(
 		(entries) => {
 			let entry = entries[0]
+			console.log(entry)
 			if (!entry.isIntersecting && entry.intersectionRatio < 1) div.style.translate = '0 -100%'
 		},
-		{ threshold: 1 }
+		{ root: document, threshold: 1 }
 	)
-	obs.observe(div)
 	setTimeout(() => {
-		obs.unobserve(div)
+		obs.observe(div)
 	}, 10)
 	if (options?.type == 'tool-menu') div.classList.add('bottom')
 	let overlay = document.createElement('div')

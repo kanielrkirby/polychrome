@@ -5,10 +5,7 @@ let nav = document.querySelector('.main-nav')!
 export default function handleKeys() {
 	onkeydown = (e) => {
 		if (document.querySelector('.confirmation-screen')) {
-			if (e.key === 'Escape') {
-				document.querySelector('.confirmation-screen')?.remove()
-				return
-			}
+			if (e.key === 'Escape') document.querySelector('.confirmation-screen')?.remove()
 			return
 		}
 		if (e.metaKey || e.ctrlKey) {
@@ -24,31 +21,31 @@ export default function handleKeys() {
 					return
 				}
 			}
-			//* CMD/Ctrl Number Locking
+		}
+		let number = parseInt(e.key)
+		if (number >= 0 && number <= 9) {
+			let { base } = router.deconstructURL(location.pathname)
 			if (base === 'create') {
-				let number = parseInt(e.key)
-				if (number >= 0 && number <= 9) {
-					e.preventDefault()
-					let slot = palette.slots[number - 1] || palette.slots[palette.slots.length - 1]
-					let swatch = document.getElementById(slot.id)
-					session.create.push({
-						undo() {
-							let slot = palette.slots[number - 1] || palette.slots[palette.slots.length - 1]
-							let swatch = document.getElementById(slot.id)
-							slot.isLocked = !slot.isLocked
-							swatch!.querySelector('.lock')!.classList.toggle('locked')
-						},
-						redo() {
-							let slot = palette.slots[number - 1] || palette.slots[palette.slots.length - 1]
-							let swatch = document.getElementById(slot.id)
-							slot.isLocked = !slot.isLocked
-							swatch!.querySelector('.lock')!.classList.toggle('locked')
-						},
-					})
-					slot.isLocked = !slot.isLocked
-					swatch!.querySelector('.lock')!.classList.toggle('locked')
-					return
-				}
+				e.preventDefault()
+				let slot = palette.slots[number - 1] || palette.slots[palette.slots.length - 1]
+				let swatch = document.getElementById(slot.id)
+				session.create.push({
+					undo() {
+						let slot = palette.slots[number - 1] || palette.slots[palette.slots.length - 1]
+						let swatch = document.getElementById(slot.id)
+						slot.isLocked = !slot.isLocked
+						swatch!.querySelector('.lock')!.classList.toggle('locked')
+					},
+					redo() {
+						let slot = palette.slots[number - 1] || palette.slots[palette.slots.length - 1]
+						let swatch = document.getElementById(slot.id)
+						slot.isLocked = !slot.isLocked
+						swatch!.querySelector('.lock')!.classList.toggle('locked')
+					},
+				})
+				slot.isLocked = !slot.isLocked
+				swatch!.querySelector('.lock')!.classList.toggle('locked')
+				return
 			}
 		}
 		if (e.key === ' ') {

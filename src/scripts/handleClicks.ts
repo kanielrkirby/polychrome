@@ -358,7 +358,6 @@ export default function handleClicks() {
 	//* Misc
 	window.ontouchend = window.onclick = globalClick
 	async function globalClick(e: MouseEvent | TouchEvent) {
-		e.preventDefault()
 		if (cancelClick) return
 		if ((e as PointerEvent).pointerType != 'mouse') {
 			cancelClick = true
