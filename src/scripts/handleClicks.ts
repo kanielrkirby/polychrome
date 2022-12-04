@@ -358,143 +358,144 @@ export default function handleClicks() {
 	//* Misc
 	window.ontouchend = window.onclick = globalClick
 	async function globalClick(e: MouseEvent | TouchEvent) {
-		if (cancelClick) return
-		if ((e as PointerEvent).pointerType != 'mouse') {
-			cancelClick = true
-			setTimeout(() => {
-				cancelClick = false
-			}, 75)
-		}
-		let target = e.target as HTMLElement
-		// Links
-		let a = target.closest('a')
-		if (a) {
-			e.preventDefault()
-			let aLink = a.getAttribute('href')!
-			mainNav.classList.remove('visible')
-			document.body.style.overflowY = ''
-			document.querySelector('.overlay')?.remove()
-			if (aLink != location.pathname) router.navigateTo(aLink)
-			return
-		}
+		if (!cancelClick) {
+			if ((e as PointerEvent).pointerType != 'mouse') {
+				cancelClick = true
+				setTimeout(() => {
+					cancelClick = false
+				}, 75)
+			}
+			let target = e.target as HTMLElement
+			// Links
+			let a = target.closest('a')
+			if (a) {
+				e.preventDefault()
+				let aLink = a.getAttribute('href')!
+				mainNav.classList.remove('visible')
+				document.body.style.overflowY = ''
+				document.querySelector('.overlay')?.remove()
+				if (aLink != location.pathname) router.navigateTo(aLink)
+				return
+			}
 
-		if (target.closest('#nav-button')) {
-			mainNav.classList.toggle('visible')
-			if (mainNav.classList.contains('visible')) {
-				let overlay = document.createElement('div')
-				overlay.classList.add('overlay')
-				overlay.onclick = overlay.ontouchend = () => {
-					overlay.remove()
-					mainNav.classList.remove('visible')
+			if (target.closest('#nav-button')) {
+				mainNav.classList.toggle('visible')
+				if (mainNav.classList.contains('visible')) {
+					let overlay = document.createElement('div')
+					overlay.classList.add('overlay')
+					overlay.onclick = overlay.ontouchend = () => {
+						overlay.remove()
+						mainNav.classList.remove('visible')
+						document.body.style.overflowY = ''
+					}
+					mainHeader.append(overlay)
+					document.body.style.overflowY = 'hidden'
+					palette.plus.hide()
+				} else {
+					mainHeader.querySelector('.overlay')?.remove()
 					document.body.style.overflowY = ''
 				}
-				mainHeader.append(overlay)
-				document.body.style.overflowY = 'hidden'
-				palette.plus.hide()
-			} else {
-				mainHeader.querySelector('.overlay')?.remove()
-				document.body.style.overflowY = ''
-			}
-		}
-
-		// Settings Button
-		if (target.closest('#settings')) {
-			confirmation('Settings', {
-				confirmation: {
-					confirm: {
-						message: 'Confirm',
-						call() {
-							let pendingSettings = local.settings
-							let element = document.querySelector('.confirmation-screen .box ul.options')!.firstChild! as HTMLElement
-							for (let key of Object.keys(pendingSettings)) {
-								console.log(key)
-								pendingSettings[key] = element.querySelector('select')!.selectedIndex
-								element = element.nextSibling! as HTMLElement
-							}
-							pendingSettings.algorithm = (
-								document.querySelector('.confirmation-screen #algorithm')! as HTMLSelectElement
-							).selectedIndex
-							local.settings = pendingSettings
-							document.body.append(toolTip('Changes saved.'))
-						},
-					},
-					cancel: {
-						message: 'Cancel',
-						call() {
-							document.body.append(toolTip('Changes discarded.'))
-						},
-					},
-				},
-				settings: [
-					{
-						message: 'Algorithm',
-						value: 'algorithm',
-						choices: [
-							{ message: 'Random Algorithm' },
-							{ message: 'Monochromatic' },
-							{ message: 'Analogous' },
-							{ message: 'Complementary' },
-							{ message: 'Split Complementary' },
-							{ message: 'Triadic' },
-							{ message: 'Tetradic' },
-							{ message: 'Square' },
-							{ message: 'Randomize' },
-						],
-					},
-					{
-						message: 'Cookies',
-						value: 'cookies',
-						choices: [
-							{ message: `No, thank you`, value: 0 },
-							{ message: `Sure, that's fine`, value: 1 },
-						],
-					},
-				],
-			})
-			return
-		}
-
-		// Confirmation Screens
-		let confirmationScreen = target.closest('.confirmation-screen')
-		if (confirmationScreen) {
-			// All overlays
-			if (target.closest('.overlay')) {
-				if (confirmationScreen == document.querySelector('.cookies')) {
-					local.settings = { cookies: 1 }
-					local.info = { firstVisit: true }
-				}
-				confirmationScreen.remove()
 			}
 
-			// Remove All
-			if (confirmationScreen.classList.contains('remove-all')) {
-				if (target.closest('.yes')) {
-					for (let i = 0; palettes.items.length; i++) palettes.removeItem(0)
-					confirmationScreen.remove()
-					let tip = toolTip('All palettes removed.')
-					document.body.append(tip)
-				} else if (target.closest('.no')) confirmationScreen.remove()
+			// Settings Button
+			if (target.closest('#settings')) {
+				confirmation('Settings', {
+					confirmation: {
+						confirm: {
+							message: 'Confirm',
+							call() {
+								let pendingSettings = local.settings
+								let element = document.querySelector('.confirmation-screen .box ul.options')!.firstChild! as HTMLElement
+								for (let key of Object.keys(pendingSettings)) {
+									console.log(key)
+									pendingSettings[key] = element.querySelector('select')!.selectedIndex
+									element = element.nextSibling! as HTMLElement
+								}
+								pendingSettings.algorithm = (
+									document.querySelector('.confirmation-screen #algorithm')! as HTMLSelectElement
+								).selectedIndex
+								local.settings = pendingSettings
+								document.body.append(toolTip('Changes saved.'))
+							},
+						},
+						cancel: {
+							message: 'Cancel',
+							call() {
+								document.body.append(toolTip('Changes discarded.'))
+							},
+						},
+					},
+					settings: [
+						{
+							message: 'Algorithm',
+							value: 'algorithm',
+							choices: [
+								{ message: 'Random Algorithm' },
+								{ message: 'Monochromatic' },
+								{ message: 'Analogous' },
+								{ message: 'Complementary' },
+								{ message: 'Split Complementary' },
+								{ message: 'Triadic' },
+								{ message: 'Tetradic' },
+								{ message: 'Square' },
+								{ message: 'Randomize' },
+							],
+						},
+						{
+							message: 'Cookies',
+							value: 'cookies',
+							choices: [
+								{ message: `No, thank you`, value: 0 },
+								{ message: `Sure, that's fine`, value: 1 },
+							],
+						},
+					],
+				})
 				return
 			}
 
-			// Are cookies okay?
-			if (confirmationScreen == document.querySelector('.cookies-confirmation')) {
-				let confirm = target.closest('.yes')
-				let cancel = target.closest('.no')
-				if (confirm) {
-					local.settings = { cookies: 1 }
+			// Confirmation Screens
+			let confirmationScreen = target.closest('.confirmation-screen')
+			if (confirmationScreen) {
+				// All overlays
+				if (target.closest('.overlay')) {
+					if (confirmationScreen == document.querySelector('.cookies')) {
+						local.settings = { cookies: 1 }
+						local.info = { firstVisit: true }
+					}
 					confirmationScreen.remove()
-					let tip = toolTip('Thanks, enjoy the site! :)')
-					document.body.append(tip)
-				} else if (cancel) {
-					local.settings = { cookies: 0 }
-					confirmationScreen.remove()
-					let tip = toolTip(`You won't be able to save your palettes. You can change this in settings.`, {
-						duration: 2500,
-					})
-					document.body.append(tip)
 				}
-				return
+
+				// Remove All
+				if (confirmationScreen.classList.contains('remove-all')) {
+					if (target.closest('.yes')) {
+						for (let i = 0; palettes.items.length; i++) palettes.removeItem(0)
+						confirmationScreen.remove()
+						let tip = toolTip('All palettes removed.')
+						document.body.append(tip)
+					} else if (target.closest('.no')) confirmationScreen.remove()
+					return
+				}
+
+				// Are cookies okay?
+				if (confirmationScreen == document.querySelector('.cookies-confirmation')) {
+					let confirm = target.closest('.yes')
+					let cancel = target.closest('.no')
+					if (confirm) {
+						local.settings = { cookies: 1 }
+						confirmationScreen.remove()
+						let tip = toolTip('Thanks, enjoy the site! :)')
+						document.body.append(tip)
+					} else if (cancel) {
+						local.settings = { cookies: 0 }
+						confirmationScreen.remove()
+						let tip = toolTip(`You won't be able to save your palettes. You can change this in settings.`, {
+							duration: 2500,
+						})
+						document.body.append(tip)
+					}
+					return
+				}
 			}
 		}
 	}
