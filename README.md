@@ -44,4 +44,4 @@ yarn dev
 
 ## Contributing
 
-This is my portfolio, sorry!
+This is meant as a personal project, sorry! Feel free to fork it though!
