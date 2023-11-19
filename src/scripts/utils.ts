@@ -47,12 +47,12 @@ const local = {
   set info(changes) {
     const items = this.info;
     if (changes)
-      for (const [key, value] of Object.entries(changes) as [keyof typeof changes, boolean][] ) {
+      for (const [key, value] of Object.entries(changes) as [keyof typeof changes, boolean][]) {
         items[key] = value;
       }
     localStorage.setItem("info", JSON.stringify(items));
   },
-  get settings(): { algorithm: number; cookies: number } {
+  get settings(): { algorithm: number; cookies: number, account: string } {
     const storageItem = localStorage.getItem("settings");
     if (storageItem) {
       return JSON.parse(storageItem);
@@ -62,6 +62,7 @@ const local = {
         JSON.stringify({
           algorithm: 2,
           cookies: 0,
+          account: "",
         }),
       );
       return this.settings;
@@ -70,7 +71,7 @@ const local = {
   set settings(changes) {
     const items = this.settings;
     if (changes)
-      for (const [key, value] of Object.entries(changes) as [keyof typeof changes, number][] ) {
+      for (const [key, value] of Object.entries(changes) as [keyof typeof changes, number][]) {
         items[key] = value;
       }
     localStorage.setItem("settings", JSON.stringify(items));
@@ -271,6 +272,7 @@ function confirmation(
       message: string;
       value: string;
       choices: { message: string; value?: string | number }[];
+      href?: string;
     }[];
     confirmation?: {
       value?: string;
@@ -337,15 +339,24 @@ function confirmation(
         const settingElement = document.createElement("li");
         const settingHeading = document.createElement("label");
         settingHeading.innerText = message;
-        const settingChoices = document.createElement("select");
-        settingChoices.id = value;
-        let i = 0;
-        for (const { message, value } of choices) {
-          const choice = document.createElement("option");
-          choice.innerText = message;
-          choice.id = (typeof value === "number" ? value : i).toString();
-          i++;
-          settingChoices.append(choice);
+        let settingChoices: HTMLSelectElement | HTMLButtonElement | HTMLAnchorElement;
+        if (choices?.length === 1) {
+          settingChoices = document.createElement("a") as HTMLAnchorElement;
+          settingChoices.href = (choices as { message: string; value: string; href: string }[])[0].href;
+          settingChoices.classList.add("button");
+          settingChoices.innerText = (choices as { message: string; value: string }[])[0].message;
+          settingChoices.onclick = () => (choices as [{ message: string; value: string; call: () => void }])[0].call();
+        } else {
+          settingChoices = document.createElement("select");
+          settingChoices.id = value;
+          let i = 0;
+          for (const { message, value } of choices) {
+            const choice = document.createElement("option");
+            choice.innerText = message;
+            choice.id = (typeof value === "number" ? value : i).toString();
+            i++;
+            settingChoices.append(choice);
+          }
         }
         settingChoices.selectedIndex = local.settings[value as keyof typeof local.settings];
         settingElement.append(settingHeading, settingChoices);

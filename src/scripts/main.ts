@@ -65,6 +65,10 @@ export const router = new Router([
     pageFactory("Create", document.getElementById("create-page") as HTMLElement, palette),
   ],
   [
+    "magic",
+    pageFactory("Login", document.getElementById("magic-page") as HTMLElement),
+  ],
+  [
     "404",
     pageFactory("404 Not Found", document.getElementById("not-found-page") as HTMLElement),
   ],
@@ -82,7 +86,7 @@ if (local.info.firstVisit)
           message: "Sure, sounds good to me.",
           call() {
             local.info = { firstVisit: false };
-            local.settings = { cookies: 1 };
+            local.settings.cookies = 1;
             document.body.append(toolTip("Thanks, enjoy the site! :)"));
           },
         },
@@ -90,7 +94,7 @@ if (local.info.firstVisit)
           message: "No thanks, I don't want to save palettes.",
           call() {
             local.info = { firstVisit: false };
-            local.settings = { cookies: 0 };
+            local.settings.cookies = 0;
             for (let i = 0; i < palettes.items.length; i++)
               palettes.removeItem(0);
             document.body.append(
