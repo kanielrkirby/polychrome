@@ -1,18 +1,17 @@
 import { testSize } from "./main";
 
 function deconstructHex(hex: string) {
-  let r = parseInt(hex[0] + hex[1], 16) / 255,
-    g = parseInt(hex[2] + hex[3], 16) / 255,
-    b = parseInt(hex[4] + hex[5], 16) / 255,
-    max = Math.max(r, g, b),
-    min = Math.min(r, g, b),
-    h,
-    s,
-    lum = r * 0.299 + g * 0.587 + b * 0.114,
-    l = (max + min) / 2;
-  if (max == min) h = s = 0;
+  const r = parseInt(hex[0] + hex[1], 16) / 255
+  const g = parseInt(hex[2] + hex[3], 16) / 255
+  const b = parseInt(hex[4] + hex[5], 16) / 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h
+  let s
+  const lum = r * 0.299 + g * 0.587 + b * 0.114
+  const l = (max + min) / 2; if (max === min) h = s = 0;
   else {
-    let d = max - min;
+    const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
       case r:
@@ -31,8 +30,8 @@ function deconstructHex(hex: string) {
 }
 
 const local = {
-  get info(): any {
-    let storageItem = localStorage.getItem("info");
+  get info(): { firstVisit: boolean } {
+    const storageItem = localStorage.getItem("info");
     if (storageItem) {
       return JSON.parse(storageItem);
     } else {
@@ -46,15 +45,15 @@ const local = {
     }
   },
   set info(changes) {
-    let items = this.info;
+    const items = this.info;
     if (changes)
-      for (let [key, value] of Object.entries(changes)) {
+      for (const [key, value] of Object.entries(changes) as [keyof typeof changes, boolean][] ) {
         items[key] = value;
       }
     localStorage.setItem("info", JSON.stringify(items));
   },
-  get settings(): any {
-    let storageItem = localStorage.getItem("settings");
+  get settings(): { algorithm: number; cookies: number } {
+    const storageItem = localStorage.getItem("settings");
     if (storageItem) {
       return JSON.parse(storageItem);
     } else {
@@ -69,29 +68,29 @@ const local = {
     }
   },
   set settings(changes) {
-    let items = this.settings;
+    const items = this.settings;
     if (changes)
-      for (let [key, value] of Object.entries(changes)) {
+      for (const [key, value] of Object.entries(changes) as [keyof typeof changes, number][] ) {
         items[key] = value;
       }
     localStorage.setItem("settings", JSON.stringify(items));
   },
   savedPalettes: {
     get items() {
-      let localString = localStorage.getItem("saved-palettes");
+      const localString = localStorage.getItem("saved-palettes");
       let storageItems;
       if (localString) {
-        let array = [];
+        const array = [];
         storageItems = JSON.parse(localString);
-        for (let item of storageItems) array.push(item);
+        for (const item of storageItems) array.push(item);
         return array;
       } else return [];
     },
-    set items(palettes: any[]) {
+    set items(palettes: string[][]) {
       localStorage.setItem("saved-palettes", JSON.stringify(palettes));
     },
-    addItem(item: any) {
-      let array = this.items;
+    addItem(item: string[]) {
+      const array = this.items;
       array.push(item);
       this.items = array;
     },
@@ -103,9 +102,9 @@ const local = {
 
 const session = {
   create: {
-    cmds: <{ undo: Function; redo: Function }[]>[],
+    cmds: <{ undo: () => void; redo: () => void }[]>[],
     cmdIndex: -1,
-    push(cmd: { undo: Function; redo: Function }) {
+    push(cmd: { undo: () => void; redo: () => void }) {
       this.cmds.splice(this.cmdIndex + 1, Infinity, cmd);
       this.cmdIndex = this.cmds.length - 1;
     },
@@ -123,15 +122,15 @@ const session = {
     },
   },
   palettes: {
-    cmds: <{ undo: Function; redo: Function }[]>[],
+    cmds: <{ undo: () => void; redo: () => void }[]>[],
     cmdIndex: -1,
-    push(cmd: { undo: Function; redo: Function }) {
+    push(cmd: { undo: () => void; redo: () => void }) {
       this.cmds.splice(this.cmdIndex + 1, Infinity, cmd);
       this.cmdIndex = this.cmds.length - 1;
     },
     undo() {
       if (this.cmdIndex > -1) {
-        let cmd = this.cmds[this.cmdIndex];
+        const cmd = this.cmds[this.cmdIndex];
         this.cmdIndex--;
         cmd.undo();
       }
@@ -139,7 +138,7 @@ const session = {
     redo() {
       if (this.cmdIndex < this.cmds.length - 1) {
         this.cmdIndex++;
-        let cmd = this.cmds[this.cmdIndex];
+        const cmd = this.cmds[this.cmdIndex];
         cmd.redo();
       }
     },
@@ -164,16 +163,15 @@ function toolTip(
       navigator.userAgent.includes("like Mac")
     )
   ) {
-    tip.style.left = options.pos[0] + "px";
-    tip.style.top = options.pos[1] + "px";
+    tip.style.left = `${options.pos[0]}px`;
+    tip.style.top = `${options.pos[1]}px`;
     setTimeout(() => {
-      if (tip.clientWidth + options.pos![0] > document.body.clientWidth) {
+      if (options.pos && tip.clientWidth + options.pos[0] > document.body.clientWidth) {
         tip.style.translate = "-100%";
-        if (tip.clientHeight + options.pos![1] > document.body.clientHeight)
+        if (tip.clientHeight + options.pos[1] > document.body.clientHeight)
           tip.style.translate = "-100 -100%";
       } else if (
-        tip.clientHeight + options.pos![1] >
-        document.body.clientHeight
+        options.pos && tip.clientHeight + options.pos[1] > document.body.clientHeight
       )
         tip.style.translate = "0 -100%";
     }, 0);
@@ -203,17 +201,17 @@ let cancelClick = false;
 function popOver(
   choices: {
     message: string;
-    call?: Function;
+    call?: () => void;
     classes?: string[];
     attributes?: string[][];
   }[],
   options?: { type?: string },
 ) {
-  let div = document.createElement("div");
+  const div = document.createElement("div");
   div.classList.add("popover");
-  let obs = new IntersectionObserver(
+  const obs = new IntersectionObserver(
     (entries) => {
-      let entry = entries[0];
+      const entry = entries[0];
       if (!entry.isIntersecting && entry.intersectionRatio < 1)
         div.style.translate = "0 -100%";
     },
@@ -222,13 +220,13 @@ function popOver(
   setTimeout(() => {
     obs.observe(div);
   }, 10);
-  if (options?.type == "tool-menu") div.classList.add("bottom");
-  let overlay = document.createElement("div");
+  if (options?.type === "tool-menu") div.classList.add("bottom");
+  const overlay = document.createElement("div");
   overlay.classList.add("clear-overlay");
   document.body.append(overlay);
-  let list = document.createElement("ul");
+  const list = document.createElement("ul");
   list.classList.add("list");
-  let remove = () => {
+  const remove = () => {
     overlay.remove();
     div.remove();
   };
@@ -241,13 +239,13 @@ function popOver(
     remove();
   };
   if (choices)
-    for (let { message, classes, attributes, call } of choices) {
-      let item = document.createElement("div");
+    for (const { message, classes, attributes, call } of choices) {
+      const item = document.createElement("div");
       item.classList.add("choice");
       item.innerHTML = message;
-      if (classes) for (let className of classes) item.classList.add(className);
+      if (classes) for (const className of classes) item.classList.add(className);
       if (attributes)
-        for (let attribute of attributes)
+        for (const attribute of attributes)
           item.setAttribute(attribute[0], attribute[1]);
       list.append(item);
       div.append(list);
@@ -276,48 +274,48 @@ function confirmation(
     }[];
     confirmation?: {
       value?: string;
-      confirm: { message: string; call?: Function };
-      cancel: { message: string; call?: Function };
+      confirm: { message: string; call?: () => void };
+      cancel: { message: string; call?: () => void };
     };
-    choices?: { message: string; value: string; call?: Function }[];
+    choices?: { message: string; value: string; call?: () => void }[];
     type?: string;
     class?: string;
   },
 ) {
-  let div = document.createElement("div");
+  const div = document.createElement("div");
   div.classList.add("confirmation-screen");
   if (options?.class) div.classList.add(options.class);
-  let h2 = document.createElement("h2");
+  const h2 = document.createElement("h2");
   h2.innerHTML = message;
-  let overlay = document.createElement("div");
+  const overlay = document.createElement("div");
   overlay.classList.add("overlay");
-  let remove = () => {
-    document.querySelector(".main-nav")!.classList.remove("visible");
+  const remove = () => {
+    (document.querySelector(".main-nav") as HTMLElement).classList.remove("visible");
     div.remove();
     document.querySelector(".overlay")?.remove();
     setTimeout(testSize, 50);
   };
   overlay.onclick = overlay.ontouchend = remove;
-  let box = document.createElement("div");
+  const box = document.createElement("div");
   box.classList.add("box");
   box.append(h2);
   div.append(box, overlay);
   function confirmationElem() {
     if (options?.confirmation?.value)
       div.classList.add(options.confirmation.value);
-    let confirmationElement = document.createElement("ul");
-    let confirm = document.createElement("li");
+    const confirmationElement = document.createElement("ul");
+    const confirm = document.createElement("li");
     confirm.classList.add("yes");
     confirm.innerHTML = options?.confirmation?.confirm.message || "Confirm";
-    let cancel = document.createElement("li");
+    const cancel = document.createElement("li");
     cancel.classList.add("no");
     cancel.innerHTML = options?.confirmation?.cancel.message || "Cancel";
-    let call = () => {
+    const call = () => {
       if (options?.confirmation?.confirm.call)
         options.confirmation.confirm.call();
       remove();
     };
-    let call2 = () => {
+    const call2 = () => {
       if (options?.confirmation?.cancel.call)
         options.confirmation.cancel.call();
       remove();
@@ -327,29 +325,29 @@ function confirmation(
     confirmationElement.append(cancel, confirm);
     return confirmationElement;
   }
-  if (options?.type == "input") {
-    let field = document.createElement("textarea");
+  if (options?.type === "input") {
+    const field = document.createElement("textarea");
     box.append(field);
   }
   if (options) {
     if (options.settings) {
-      let settings = document.createElement("ul");
+      const settings = document.createElement("ul");
       settings.classList.add("options");
-      for (let { message, value, choices } of options.settings) {
-        let settingElement = document.createElement("li");
-        let settingHeading = document.createElement("label");
+      for (const { message, value, choices } of options.settings) {
+        const settingElement = document.createElement("li");
+        const settingHeading = document.createElement("label");
         settingHeading.innerText = message;
-        let settingChoices = document.createElement("select");
+        const settingChoices = document.createElement("select");
         settingChoices.id = value;
         let i = 0;
-        for (let { message, value } of choices) {
-          let choice = document.createElement("option");
+        for (const { message, value } of choices) {
+          const choice = document.createElement("option");
           choice.innerText = message;
-          choice.id = (typeof value == "number" ? value : i).toString();
+          choice.id = (typeof value === "number" ? value : i).toString();
           i++;
           settingChoices.append(choice);
         }
-        settingChoices.selectedIndex = local.settings[value];
+        settingChoices.selectedIndex = local.settings[value as keyof typeof local.settings];
         settingElement.append(settingHeading, settingChoices);
         settings.append(settingElement);
       }
