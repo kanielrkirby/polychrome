@@ -8,39 +8,39 @@ import handleDrag from "./handleDrag";
 import handleKeys from "./handleKeys";
 
 // Global Variables
-export let palette = new Palette();
-export let palettes = new SavedPalettes();
+export const palette = new Palette();
+export const palettes = new SavedPalettes();
 
 // Routing
 const siteTitle = document.title;
-const toolbar = document.querySelector(".toolbar")!;
+const toolbar = document.querySelector(".toolbar") as HTMLElement;
 function pageFactory(
   title: string,
   element: HTMLElement,
-  context?: any,
-): Function {
+  context?: Palette | SavedPalettes,
+): (ids?: string[]) => void {
   return (ids?: string[]) => {
-    document.title = siteTitle + " | " + title;
+    document.title = `${siteTitle} | ${title}`;
     const currentView = document.querySelector("main.visible");
     if (currentView) currentView.classList.remove("visible");
     const nextView = element;
     nextView?.classList.add("visible");
-    if (title == "Palettes") {
-      document.body.parentElement!.style.overflow = "";
+    if (title === "Palettes") {
+      (document.body.parentElement as HTMLElement).style.overflow = "";
       document.body.style.overflow = "";
       toolbar.classList.add("palettes");
       toolbar.classList.remove("create");
-      context.draw(local.savedPalettes.items);
-    } else if (title == "Create") {
-      document.body.parentElement!.style.overflow = "hidden";
+      if (context instanceof SavedPalettes) context?.draw(local.savedPalettes.items);
+    } else if (title === "Create") {
+      (document.body.parentElement as HTMLElement).style.overflow = "hidden";
       document.body.style.overflow = "hidden";
       toolbar.classList.add("create");
       toolbar.classList.remove("palettes");
-      if (ids) context.generate(ids);
-      else {
-        let slots = context.generate();
-        let hexes = [];
-        for (let slot of slots) hexes.push(slot.hex);
+      if (ids && context instanceof Palette) context?.generate(ids);
+      else if (context instanceof Palette) {
+        const slots = context?.generate() as Palette["slots"];
+        const hexes = [];
+        for (const slot of slots) hexes.push(slot.hex);
         history.replaceState("", "", hexes.join("-"));
       }
     } else {
@@ -50,23 +50,23 @@ function pageFactory(
     }
   };
 }
-export let router = new Router([
-  ["", pageFactory("Home", document.getElementById("landing-page")!)],
+export const router = new Router([
+  ["", pageFactory("Home", document.getElementById("landing-page") as HTMLElement)],
   [
     "palettes",
     pageFactory(
       "Palettes",
-      document.getElementById("palettes-page")!,
+      document.getElementById("palettes-page") as HTMLElement,
       palettes,
     ),
   ],
   [
     "create",
-    pageFactory("Create", document.getElementById("create-page")!, palette),
+    pageFactory("Create", document.getElementById("create-page") as HTMLElement, palette),
   ],
   [
     "404",
-    pageFactory("404 Not Found", document.getElementById("not-found-page")!),
+    pageFactory("404 Not Found", document.getElementById("not-found-page") as HTMLElement),
   ],
 ]);
 router.routeToURL(location.pathname);
@@ -79,7 +79,7 @@ if (local.info.firstVisit)
     {
       confirmation: {
         confirm: {
-          message: `Sure, sounds good to me.`,
+          message: "Sure, sounds good to me.",
           call() {
             local.info = { firstVisit: false };
             local.settings = { cookies: 1 };
@@ -87,7 +87,7 @@ if (local.info.firstVisit)
           },
         },
         cancel: {
-          message: `No thanks, I don't want to save palettes.`,
+          message: "No thanks, I don't want to save palettes.",
           call() {
             local.info = { firstVisit: false };
             local.settings = { cookies: 0 };
@@ -95,7 +95,7 @@ if (local.info.firstVisit)
               palettes.removeItem(0);
             document.body.append(
               toolTip(
-                `You won't be able to save your palettes. You can change this in settings.`,
+                "You won't be able to save your palettes. You can change this in settings.",
                 {
                   duration: 2500,
                 },
@@ -114,7 +114,7 @@ if (
 )
   document.body.classList.add("mobile");
 export function testSize() {
-  (document.querySelector(":root")! as HTMLElement).style.display = "initial";
+  (document.querySelector(":root") as HTMLElement).style.display = "initial";
   if (window.innerHeight > window.innerWidth) {
     document.body.classList.add("vertical");
     document.body.classList.remove("landscape-thin");
@@ -138,7 +138,7 @@ onmouseover = (e) => {
       const detector = target.closest(".detector");
       if (detector && palette.slots.length < 10) {
         const left = target.closest(".left");
-        let index = parseInt(swatch.getAttribute("data-color-index")!);
+        let index = parseInt(swatch.getAttribute("data-color-index") as string);
         if (left) index--;
         palette.plus.show(index);
       } else palette.plus.hide(0);
