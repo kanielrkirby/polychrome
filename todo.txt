@@ -1,9 +1,0 @@
-add color picker
-fix create import button
-fix key inputs
-fix menu button on mobile
-fix click animations for mobile
-add plus buttons for mobile
-DONE fix animation for locks on ios
-fix swatch deletion/adding routing
-fix randomize button resettings to monochromatic
