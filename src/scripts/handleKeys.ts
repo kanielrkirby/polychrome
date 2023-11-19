@@ -1,7 +1,7 @@
 import { palette, router } from "./main";
 import { session } from "./utils";
 
-let nav = document.querySelector(".main-nav")!;
+const nav = document.querySelector(".main-nav") as HTMLElement;
 export default function handleKeys() {
   onkeydown = (e) => {
     if (document.querySelector(".confirmation-screen")) {
@@ -11,7 +11,7 @@ export default function handleKeys() {
       return;
     }
     if (e.metaKey || e.ctrlKey) {
-      let { base } = router.deconstructURL(location.pathname);
+      const { base } = router.deconstructURL(location.pathname);
       if (e.key === "z" || e.key === "Z") {
         if (base === "palettes") {
           if (e.shiftKey) session.palettes.redo();
@@ -24,61 +24,61 @@ export default function handleKeys() {
         }
       }
     }
-    let number = parseInt(e.key);
+    const number = parseInt(e.key);
     if (number >= 0 && number <= 9) {
-      let { base } = router.deconstructURL(location.pathname);
+      const { base } = router.deconstructURL(location.pathname);
       if (base === "create") {
         e.preventDefault();
-        let slot =
+        const slot =
           palette.slots[number - 1] || palette.slots[palette.slots.length - 1];
-        let swatch = document.getElementById(slot.id);
+        const swatch = document.getElementById(slot.id) as HTMLElement;
         session.create.push({
           undo() {
-            let slot =
+            const slot =
               palette.slots[number - 1] ||
               palette.slots[palette.slots.length - 1];
-            let swatch = document.getElementById(slot.id);
+            const swatch = document.getElementById(slot.id) as HTMLElement;
             slot.isLocked = !slot.isLocked;
-            swatch!.querySelector(".lock")!.classList.toggle("locked");
+            (swatch.querySelector(".lock") as HTMLElement).classList.toggle("locked");
           },
           redo() {
-            let slot =
+            const slot =
               palette.slots[number - 1] ||
               palette.slots[palette.slots.length - 1];
-            let swatch = document.getElementById(slot.id);
+            const swatch = document.getElementById(slot.id) as HTMLElement;
             slot.isLocked = !slot.isLocked;
-            swatch!.querySelector(".lock")!.classList.toggle("locked");
+            (swatch.querySelector(".lock") as HTMLElement).classList.toggle("locked");
           },
         });
         slot.isLocked = !slot.isLocked;
-        swatch!.querySelector(".lock")!.classList.toggle("locked");
+        (swatch.querySelector(".lock") as HTMLElement).classList.toggle("locked");
         return;
       }
     }
     if (e.key === " ") {
       //* Space Generate
-      let { base } = router.deconstructURL(location.pathname);
+      const { base } = router.deconstructURL(location.pathname);
       if (base === "create") {
         e.preventDefault();
-        let prevIds: string[] = [];
-        for (let { hex } of palette.slots) prevIds.push(hex);
+        const prevIds: string[] = [];
+        for (const { hex } of palette.slots) prevIds.push(hex);
         palette.generate();
-        let ids: string[] = [];
-        for (let { hex } of palette.slots) ids.push(hex);
-        history.replaceState("", "", "/polychrome/create/" + ids.join("-"));
+        const ids: string[] = [];
+        for (const { hex } of palette.slots) ids.push(hex);
+        history.replaceState("", "", `/polychrome/create/${ids.join("-")}`);
         session.create.push({
           undo: () => {
             palette.generate(prevIds);
             history.replaceState(
               "",
               "",
-              "/polychrome/create/" + prevIds.join("-"),
+              `/polychrome/create/${prevIds.join("-")}`
             );
             palette.plus.hide();
           },
           redo: () => {
             palette.generate(ids);
-            history.replaceState("", "", "/polychrome/create/" + ids.join("-"));
+            history.replaceState("", "", `/polychrome/create/${ids.join("-")}`);
           },
         });
       }
@@ -93,7 +93,7 @@ export default function handleKeys() {
     }
     //! NOT DONE
     if (e.key === "Enter") {
-      let a: HTMLElement = document.activeElement as HTMLElement;
+      const a: HTMLElement = document.activeElement as HTMLElement;
       console.log(a);
       return;
     }
