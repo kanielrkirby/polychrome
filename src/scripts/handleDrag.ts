@@ -5,7 +5,7 @@ export default function handleDrag() {
 	window.addEventListener('scroll', stopMotion, false)
 	window.addEventListener('touchmove', stopMotion, { passive: false })
 	function stopMotion(e: Event) {
-		if (router.deconstructURL(location.pathname).base == 'create') {
+		if (router.deconstructURL(location.pathname).base === 'create') {
 			e.preventDefault()
 			e.stopPropagation()
 		}
@@ -18,23 +18,23 @@ export default function handleDrag() {
 			!(e.targetTouches[0].target as HTMLElement).closest('.options div') &&
 			!(e.targetTouches[0].target as HTMLElement).closest('.options svg')
 		) {
-			for (let { id } of palette.slots) if (document.getElementById(id)!.classList.contains('is-dragging')) return
+			for (const { id } of palette.slots) if ((document.getElementById(id) as HTMLElement).classList.contains('is-dragging')) return
 			let vertical = false
 			if (document.body.classList.contains('vertical')) vertical = true
 			palette.plus.disabled = true
 			palette.plus.hide()
 			swatch.classList.add('is-dragging')
-			let startPos = vertical ? e.touches[0].clientY : e.touches[0].clientX,
-				index = parseInt(swatch.getAttribute('data-color-index')!),
-				slot = palette.slots[index],
-				prevAmount = 0,
-				amount = 0,
-				swatchSize = vertical ? swatch.clientHeight : swatch.clientWidth,
-				translateNext = vertical ? '0 ' + swatchSize + 'px' : swatchSize + 'px',
-				translatePrev = vertical ? '0 ' + -swatchSize + 'px' : -swatchSize + 'px',
-				lowerLimit = -index * swatchSize,
-				upperLimit = (palette.slots.length - index - 1) * swatchSize,
-				pos = vertical
+			const startPos = vertical ? e.touches[0].clientY : e.touches[0].clientX
+      let index = parseInt(swatch.getAttribute('data-color-index') as string)
+      const slot = palette.slots[index]
+      let prevAmount = 0
+      let amount = 0
+      const swatchSize = vertical ? swatch.clientHeight : swatch.clientWidth
+      const translateNext = vertical ? `0 ${swatchSize}px` : `${swatchSize}px`
+      const translatePrev = vertical ? `0 ${-swatchSize}px` : `${-swatchSize}px`
+      const lowerLimit = -index * swatchSize
+      const upperLimit = (palette.slots.length - index - 1) * swatchSize
+		  const pos = vertical
 					? (e: TouchEvent) => e.touches[0].clientY - startPos
 					: (e: TouchEvent) => e.touches[0].clientX - startPos
 
@@ -78,9 +78,9 @@ export default function handleDrag() {
 							swatch.remove()
 						}
 						swatch.style.translate = ''
-						let arr = []
-						for (let slot of palette.slots) {
-							let swatch = document.getElementById(slot.id)!
+						const arr = []
+						for (const slot of palette.slots) {
+							const swatch = document.getElementById(slot.id) as HTMLElement
 							swatch.style.transition = 'transform 0s'
 							swatch.style.translate = ''
 							setTimeout(() => {
@@ -95,13 +95,14 @@ export default function handleDrag() {
 							session.create.push({
 								undo() {
 									palette.plus.hide()
-									let next = (swatch = document.getElementById(slot.id)!)
+									let next = document.getElementById(slot.id) as HTMLElement
+                  swatch = next
 									for (let i = 0; i < -amount; i++) {
 										palette.slots.splice(slot.data, 1)
 										palette.slots.splice(slot.data + 1, 0, slot)
 										slot.data++
 										next = next.nextElementSibling as HTMLElement
-										let index = parseInt(next.getAttribute('data-color-index')!)
+										const index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index - 1).toString())
 									}
 									for (let i = 0; i > -amount; i--) {
@@ -109,7 +110,7 @@ export default function handleDrag() {
 										palette.slots.splice(slot.data - 1, 0, slot)
 										slot.data--
 										next = next.previousElementSibling as HTMLElement
-										let index = parseInt(next.getAttribute('data-color-index')!)
+										const index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index + 1).toString())
 									}
 									copy = swatch.cloneNode(true)
@@ -120,19 +121,20 @@ export default function handleDrag() {
 										next.before(copy)
 										swatch.remove()
 									}
-									let arr = []
-									for (let slot of palette.slots) arr.push(slot.hex)
+									const arr = []
+									for (const slot of palette.slots) arr.push(slot.hex)
 									history.replaceState('', '', arr.join('-'))
 								},
 								redo() {
 									palette.plus.hide()
-									let next = (swatch = document.getElementById(slot.id)!)
+									let next = document.getElementById(slot.id) as HTMLElement
+                  swatch = next
 									for (let i = 0; i < amount; i++) {
 										palette.slots.splice(slot.data, 1)
 										palette.slots.splice(slot.data + 1, 0, slot)
 										slot.data++
 										next = next.nextElementSibling as HTMLElement
-										index = parseInt(next.getAttribute('data-color-index')!)
+										index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index - 1).toString())
 									}
 									for (let i = 0; i > amount; i--) {
@@ -140,7 +142,7 @@ export default function handleDrag() {
 										palette.slots.splice(slot.data - 1, 0, slot)
 										slot.data--
 										next = next.previousElementSibling as HTMLElement
-										index = parseInt(next.getAttribute('data-color-index')!)
+										index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index + 1).toString())
 									}
 									copy = swatch.cloneNode(true)
@@ -151,8 +153,8 @@ export default function handleDrag() {
 										next.before(copy)
 										swatch.remove()
 									}
-									let arr = []
-									for (let slot of palette.slots) arr.push(slot.hex)
+									const arr = []
+									for (const slot of palette.slots) arr.push(slot.hex)
 									history.replaceState('', '', arr.join('-'))
 								},
 							})
@@ -167,12 +169,12 @@ export default function handleDrag() {
 				let t = pos(e)
 				if (t < lowerLimit) t = lowerLimit
 				else if (t > upperLimit) t = upperLimit
-				swatch.style.translate = vertical ? '0 ' + t + 'px' : t + 'px'
+        swatch.style.translate = vertical ? `0 ${t}px` : `${t}px`
 				amount = Math.round(t / swatchSize)
-				if (amount != prevAmount) {
-					for (let slot of palette.slots) {
-						let swatch2 = document.getElementById(slot.id)!
-						if (swatch != swatch2) {
+				if (amount !== prevAmount) {
+					for (const slot of palette.slots) {
+						const swatch2 = document.getElementById(slot.id) as HTMLElement
+						if (swatch !== swatch2) {
 							if (slot.index < index && index + amount <= slot.index) swatch2.style.translate = translateNext
 							else if (slot.index > index && index + amount >= slot.index) swatch2.style.translate = translatePrev
 							else swatch2.style.translate = '0 0'
@@ -191,23 +193,23 @@ export default function handleDrag() {
 			!(e.target as HTMLElement).closest('.options div') &&
 			!(e.target as HTMLElement).closest('.options svg')
 		) {
-			for (let { id } of palette.slots) if (document.getElementById(id)!.classList.contains('is-dragging')) return
+			for (const { id } of palette.slots) if ((document.getElementById(id) as HTMLElement).classList.contains('is-dragging')) return
 			let vertical = false
 			if (document.body.classList.contains('vertical')) vertical = true
 			palette.plus.disabled = true
 			palette.plus.hide()
 			swatch.classList.add('is-dragging')
-			let startPos = vertical ? e.y : e.x,
-				index = parseInt(swatch.getAttribute('data-color-index')!),
-				slot = palette.slots[index],
-				prevAmount = 0,
-				amount = 0,
-				swatchSize = vertical ? swatch.clientHeight : swatch.clientWidth,
-				translateNext = vertical ? '0 ' + swatchSize + 'px' : swatchSize + 'px',
-				translatePrev = vertical ? '0 ' + -swatchSize + 'px' : -swatchSize + 'px',
-				lowerLimit = -index * swatchSize,
-				upperLimit = (palette.slots.length - index - 1) * swatchSize,
-				pos = vertical ? (e: MouseEvent) => e.y - startPos : (e: MouseEvent) => e.x - startPos
+			const startPos = vertical ? e.y : e.x
+      let index = parseInt(swatch.getAttribute('data-color-index') as string)
+      const slot = palette.slots[index]
+      let prevAmount = 0
+      let amount = 0
+      const swatchSize = vertical ? swatch.clientHeight : swatch.clientWidth
+      const translateNext = vertical ? `0 ${swatchSize}px` : `${swatchSize}px`
+      const translatePrev = vertical ? `0 ${-swatchSize}px` : `${-swatchSize}px`
+      const lowerLimit = -index * swatchSize
+      const upperLimit = (palette.slots.length - index - 1) * swatchSize
+      const pos = vertical ? (e: MouseEvent) => e.y - startPos : (e: MouseEvent) => e.x - startPos
 
 			//* Mouse tracking
 			addEventListener('mousemove', dragHandler)
@@ -249,9 +251,9 @@ export default function handleDrag() {
 							swatch.remove()
 						}
 						swatch.style.translate = ''
-						let arr = []
-						for (let slot of palette.slots) {
-							let swatch = document.getElementById(slot.id)!
+						const arr = []
+						for (const slot of palette.slots) {
+							const swatch = document.getElementById(slot.id) as HTMLElement
 							swatch.style.transition = 'transform 0s'
 							swatch.style.translate = ''
 							setTimeout(() => {
@@ -266,13 +268,14 @@ export default function handleDrag() {
 							session.create.push({
 								undo() {
 									palette.plus.hide()
-									let next = (swatch = document.getElementById(slot.id)!)
+									let next = document.getElementById(slot.id) as HTMLElement
+                  swatch = next
 									for (let i = 0; i < -amount; i++) {
 										palette.slots.splice(slot.data, 1)
 										palette.slots.splice(slot.data + 1, 0, slot)
 										slot.data++
 										next = next.nextElementSibling as HTMLElement
-										let index = parseInt(next.getAttribute('data-color-index')!)
+										const index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index - 1).toString())
 									}
 									for (let i = 0; i > -amount; i--) {
@@ -280,7 +283,7 @@ export default function handleDrag() {
 										palette.slots.splice(slot.data - 1, 0, slot)
 										slot.data--
 										next = next.previousElementSibling as HTMLElement
-										let index = parseInt(next.getAttribute('data-color-index')!)
+										const index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index + 1).toString())
 									}
 									copy = swatch.cloneNode(true)
@@ -291,19 +294,20 @@ export default function handleDrag() {
 										next.before(copy)
 										swatch.remove()
 									}
-									let arr = []
-									for (let slot of palette.slots) arr.push(slot.hex)
+									const arr = []
+									for (const slot of palette.slots) arr.push(slot.hex)
 									history.replaceState('', '', arr.join('-'))
 								},
 								redo() {
 									palette.plus.hide()
-									let next = (swatch = document.getElementById(slot.id)!)
+									let next = document.getElementById(slot.id) as HTMLElement
+                  swatch = next
 									for (let i = 0; i < amount; i++) {
 										palette.slots.splice(slot.data, 1)
 										palette.slots.splice(slot.data + 1, 0, slot)
 										slot.data++
 										next = next.nextElementSibling as HTMLElement
-										index = parseInt(next.getAttribute('data-color-index')!)
+										index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index - 1).toString())
 									}
 									for (let i = 0; i > amount; i--) {
@@ -311,7 +315,7 @@ export default function handleDrag() {
 										palette.slots.splice(slot.data - 1, 0, slot)
 										slot.data--
 										next = next.previousElementSibling as HTMLElement
-										index = parseInt(next.getAttribute('data-color-index')!)
+										index = parseInt(next.getAttribute('data-color-index') as string)
 										next.setAttribute('data-color-index', (index + 1).toString())
 									}
 									copy = swatch.cloneNode(true)
@@ -322,8 +326,8 @@ export default function handleDrag() {
 										next.before(copy)
 										swatch.remove()
 									}
-									let arr = []
-									for (let slot of palette.slots) arr.push(slot.hex)
+									const arr = []
+									for (const slot of palette.slots) arr.push(slot.hex)
 									history.replaceState('', '', arr.join('-'))
 								},
 							})
@@ -338,12 +342,13 @@ export default function handleDrag() {
 				let t = pos(e)
 				if (t < lowerLimit) t = lowerLimit
 				else if (t > upperLimit) t = upperLimit
-				swatch.style.translate = vertical ? '0 ' + t + 'px' : t + 'px'
+        swatch.style.translate = vertical ? `0 ${t}px` : `${t}px`
+
 				amount = Math.round(t / swatchSize)
-				if (amount != prevAmount) {
-					for (let slot of palette.slots) {
-						let swatch2 = document.getElementById(slot.id)!
-						if (swatch != swatch2) {
+				if (amount !== prevAmount) {
+					for (const slot of palette.slots) {
+						const swatch2 = document.getElementById(slot.id) as HTMLElement
+						if (swatch !== swatch2) {
 							if (slot.index < index && index + amount <= slot.index) swatch2.style.translate = translateNext
 							else if (slot.index > index && index + amount >= slot.index) swatch2.style.translate = translatePrev
 							else swatch2.style.translate = '0 0'
