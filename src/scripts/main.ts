@@ -6,6 +6,7 @@ import Router from "./routing";
 import handleClicks from "./handleClicks";
 import handleDrag from "./handleDrag";
 import handleKeys from "./handleKeys";
+import "./auth";
 
 // Global Variables
 export const palette = new Palette();
@@ -63,10 +64,6 @@ export const router = new Router([
   [
     "create",
     pageFactory("Create", document.getElementById("create-page") as HTMLElement, palette),
-  ],
-  [
-    "magic",
-    pageFactory("Login", document.getElementById("magic-page") as HTMLElement),
   ],
   [
     "404",

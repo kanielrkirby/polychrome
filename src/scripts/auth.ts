@@ -5,11 +5,20 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY as string
 )
 
+let user;
+(async () => {
+  user = await supabase.auth.getUser()
+  supabase.auth.onAuthStateChange((_event, session) => {
+    user = session?.user
+  })
+  console.log(user)
+})()
+
 export async function signInWithEmail(email: string) {
   const { data, error } = await supabase.auth.signInWithOtp({
     email,
   })
-  return { data, error }
+  user = data?.user
 }
 
 export async function signOut() {

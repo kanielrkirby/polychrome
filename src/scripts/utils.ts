@@ -339,13 +339,16 @@ function confirmation(
         const settingElement = document.createElement("li");
         const settingHeading = document.createElement("label");
         settingHeading.innerText = message;
-        let settingChoices: HTMLSelectElement | HTMLButtonElement | HTMLAnchorElement;
+        let settingChoices: HTMLSelectElement | HTMLButtonElement | HTMLFormElement;
         if (choices?.length === 1) {
-          settingChoices = document.createElement("a") as HTMLAnchorElement;
-          settingChoices.href = (choices as { message: string; value: string; href: string }[])[0].href;
-          settingChoices.classList.add("button");
-          settingChoices.innerText = (choices as { message: string; value: string }[])[0].message;
-          settingChoices.onclick = () => (choices as [{ message: string; value: string; call: () => void }])[0].call();
+          settingChoices = document.createElement("form") as HTMLFormElement;
+          settingChoices.classList.add("login")
+          const input = document.createElement("input")
+          const button = document.createElement("button")
+          button.innerText = "Login"
+          input.placeholder = "Enter your email!"
+          settingChoices.append(input, button)
+          settingChoices.onsubmit = () => (choices as [{ message: string; value: string; call: () => void }])[0].call();
         } else {
           settingChoices = document.createElement("select");
           settingChoices.id = value;
@@ -358,7 +361,9 @@ function confirmation(
             settingChoices.append(choice);
           }
         }
-        settingChoices.selectedIndex = local.settings[value as keyof typeof local.settings];
+        if (settingChoices instanceof HTMLSelectElement) {
+          settingChoices.selectedIndex = local.settings[value as keyof typeof local.settings];
+        }
         settingElement.append(settingHeading, settingChoices);
         settings.append(settingElement);
       }

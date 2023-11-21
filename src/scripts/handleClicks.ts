@@ -3,26 +3,6 @@ import { session, toolTip, popOver, local, confirmation } from "./utils";
 import { signInWithEmail, } from "./auth"
 import { Slot } from "./palette";
 export default function handleClicks() {
-  // Magic Link Form Page
-  const magicLinkForm = document.querySelector(
-    ".magic-form",
-  ) as HTMLElement;
-  const magicLinkFormInput = magicLinkForm.querySelector(
-    "input",
-  ) as HTMLInputElement;
-  const magicLinkFormButton = magicLinkForm.querySelector(
-    "button",
-  ) as HTMLButtonElement;
-  magicLinkForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const email = magicLinkFormInput.value;
-    if (email) {
-      magicLinkFormButton.disabled = true;
-    }
-    await signInWithEmail(email);
-    magicLinkFormButton.disabled = false;
-  };
-
   // Create Page Palette
   let cancelClick = false;
   const pal = document.querySelector("#palette") as HTMLElement;
@@ -483,10 +463,16 @@ export default function handleClicks() {
               ],
             },
             {
-              message: "Login?",
+              message: "Login",
               value: "login",
               choices: [
-                { message: "Login", value: "login", href: "/polychrome/magic" },
+                { message: "Login", value: "login", call: (e: SubmitEvent) => {
+                  e.preventDefault();
+                  const email = (e.target as HTMLFormElement).querySelector("input") as HTMLInputElement;
+                  (async () => {
+                    await signInWithEmail(email); 
+                  })()
+                } },
               ]
             }
           ],
